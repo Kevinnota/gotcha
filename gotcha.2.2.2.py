@@ -514,6 +514,18 @@ while not (((finish_position-start_position)/3.0).is_integer()):
     finish_position-=1
     lenght=((finish_position-start_position)/3.0)
 
+#correcting size for the triplet cutoff (prevent sequences being lost due to gaps)
+count_eng_gap=0
+frag_count=0
+while not (seq_count<=(frag_count)):
+    count_eng_gap=0
+    frag_count=0
+    for i in range(len(input_sequences)):
+        if(len(re.findall("-$", (str(input_sequences[i].seq[start_position:finish_position]))))!=0):
+            count_eng_gap+=1
+        if(len(re.findall("^-|-$|^N|N$", (str(input_sequences[i].seq[start_position:finish_position]))))==0):
+            frag_count+=1
+    finish_position=finish_position-3	
 
 #Creating new fasta file with original labels but new sequence 
 new_fasta=list()
