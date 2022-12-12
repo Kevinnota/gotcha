@@ -508,6 +508,7 @@ while not (find_optimal_fragment==True):
         find_optimal_fragment=True
         start_position=fragment_selections.loc[i,'start position']
         finish_position=fragment_selections.loc[i,'finish_position']
+	seq_count=fragment_selections.loc[i, 'number of sequences']
     i=i+1
 
 while not (((finish_position-start_position)/3.0).is_integer()):
