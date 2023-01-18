@@ -1,7 +1,42 @@
-# <i>Gotcha</i>
+
+
+
+          _____                   _______               _____                    _____                    _____                    _____          
+         /\    \                 /::\    \             /\    \                  /\    \                  /\    \                  /\    \         
+        /::\    \               /::::\    \           /::\    \                /::\    \                /::\____\                /::\    \        
+       /::::\    \             /::::::\    \          \:::\    \              /::::\    \              /:::/    /               /::::\    \       
+      /::::::\    \           /::::::::\    \          \:::\    \            /::::::\    \            /:::/    /               /::::::\    \      
+     /:::/\:::\    \         /:::/~~\:::\    \          \:::\    \          /:::/\:::\    \          /:::/    /               /:::/\:::\    \     
+    /:::/  \:::\    \       /:::/    \:::\    \          \:::\    \        /:::/  \:::\    \        /:::/____/               /:::/__\:::\    \    
+   /:::/    \:::\    \     /:::/    / \:::\    \         /::::\    \      /:::/    \:::\    \      /::::\    \              /::::\   \:::\    \   
+  /:::/    / \:::\    \   /:::/____/   \:::\____\       /::::::\    \    /:::/    / \:::\    \    /::::::\    \   _____    /::::::\   \:::\    \  
+ /:::/    /   \:::\ ___\ |:::|    |     |:::|    |     /:::/\:::\    \  /:::/    /   \:::\    \  /:::/\:::\    \ /\    \  /:::/\:::\   \:::\    \ 
+/:::/____/  ___\:::|    ||:::|____|     |:::|    |    /:::/  \:::\____\/:::/____/     \:::\____\/:::/  \:::\    /::\____\/:::/  \:::\   \:::\____\
+\:::\    \ /\  /:::|____| \:::\    \   /:::/    /    /:::/    \::/    /\:::\    \      \::/    /\::/    \:::\  /:::/    /\::/    \:::\  /:::/    /
+ \:::\    /::\ \::/    /   \:::\    \ /:::/    /    /:::/    / \/____/  \:::\    \      \/____/  \/____/ \:::\/:::/    /  \/____/ \:::\/:::/    / 
+  \:::\   \:::\ \/____/     \:::\    /:::/    /    /:::/    /            \:::\    \                       \::::::/    /            \::::::/    /  
+   \:::\   \:::\____\        \:::\__/:::/    /    /:::/    /              \:::\    \                       \::::/    /              \::::/    /   
+    \:::\  /:::/    /         \::::::::/    /     \::/    /                \:::\    \                      /:::/    /               /:::/    /    
+     \:::\/:::/    /           \::::::/    /       \/____/                  \:::\    \                    /:::/    /               /:::/    /     
+      \::::::/    /             \::::/    /                                  \:::\    \                  /:::/    /               /:::/    /      
+       \::::/    /               \::/____/                                    \:::\____\                /:::/    /               /:::/    /       
+        \::/____/                 ~~                                           \::/    /                \::/    /                \::/    /        
+                                                                                \/____/                  \/____/                  \/____/         
+                                                                                                                                                  
+
+
+# GOTCHA: an automated workflow for eDNA target capture bait design.
+
 This is the repository for the automated workflow for environmental DNA target capture bait design - “<i>Gotcha</i>”. By default, Gotcha is using <i>BOLD-CLI</i> for downloading standard barcoding genes such as COI, <i>rbc</i>L, and <i>mat</i>K, followed by filtering and alignment steps, and selection of the fragment of the barcoding gene which is covered the most. This will create a “clean” multiple sequence alignment (MSA) which is used to infer a gene tree which is used to reconstruct ancestral state sequences. These sequences are then processed to only the node/tip sequences required for capturing the fast genetic diversity in the original MSA. The tool allows costume inputs for most major steps, which allows the use of non-standard barcoding genes to be used or manually improve the MSA before building gene trees etc.
 
-# How to run <i>Gotcha</i>
+## Install <i>Gotcha</i>
+Think/hope this will become
+  
+```{bash}
+conda install gotcha #not working at the moment
+```
+
+## How to run <i>Gotcha</i>
 
 The most default way to run <i>gotcha</i> only requires the -t (--taxa), -m (--marker) and -c (--code) flags. This will download the specified marker from BOLD for the specified taxonomic name, and the genetic code belonging to the marker. The available markers are ["COI-5P", "COI-3P", "rbcL", "matK", and "ITS"]. 
 
