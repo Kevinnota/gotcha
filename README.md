@@ -13,7 +13,7 @@ conda install gotcha #not working at the moment
 
 The most default way to run <i>gotcha</i> only requires the -t (--taxa), -m (--marker) and -c (--code) flags. This will download the specified marker from BOLD for the specified taxonomic name, and the genetic code belonging to the marker. The available markers are ["COI-5P", "COI-3P", "rbcL", "matK", and "ITS"]. 
 
-<i>The code below will downloads all sequences from the Pilosa order containing anteaters and sloths.</i>
+<i>The code below will download all sequences from the Pilosa order containing anteaters and sloths.</i>
 ```{bash}
 python3 gotcha.2.2.2.py -t Pilosa -m COI-5P -c 5 
 ```
