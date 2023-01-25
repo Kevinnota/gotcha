@@ -113,7 +113,7 @@ atagtcggcaccgccctcagtctactcattcgcgcagaactcggtcaaccaggcacccttctaggtgatgaccaaatcta
 ```
 
 <i>summary_stats.pdf</i>
-![](https://github.com/Kevinnota/gotcha/blob/main/example_files/summary_stats.pdf)
+![pdf](https://github.com/Kevinnota/gotcha/blob/main/example_files/summary_stats.pdf)
 
 # <i>Gotcha</i> with costume input files 
 In some cases it might be required to run BOLD with costume input files, such as non-standard marker gene, or in house reference sequences. See here for the costume files that can be used - [custom inputs usage](https://github.com/Kevinnota/gotcha/blob/main/documentation/3.md)
