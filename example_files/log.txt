@@ -1,0 +1,40 @@
+# analysis started on 2023-01-24 16:07:06
+
+
+	 INPUTS:
+
+	 BOLD TAXONOMY 		Circus
+	 GEOGRAPHY 		N
+	 CUSTOM SEQUENCES 	N
+	 CUSTOM ALIGNMENT 	N
+	 CUSTOM TREE 		N
+	 MARKER 		COI-5P
+	 GEN CODE 		2
+	 FAST MODE 		N
+
+
+	 PARAMETERS:
+
+	 TAXONOMIC FILTER 	N
+	 MIN MARKER LENGTH 	100
+	 MAX MARKER IDENTITY 	1
+	 BAITS LENGTH 		80
+	 BAITS TILING 		10
+	 TRIMAL 		N
+	 DUST TRESHOLD 		1
+
+
+	 FILTERING:
+
+	 61	 starting sequences
+	 60	 after taxonomic filtering
+	 43	 after identity collapse
+	 33	 after removing sequences with non ATGC nucleotides
+	 33	 after length filter
+	 33	 after the removal of sequences with stop codons
+	 32	 after size selection
+
+
+	 BAITS:
+
+	 162	 baits
