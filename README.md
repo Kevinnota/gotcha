@@ -116,7 +116,7 @@ atagtcggcaccgccctcagtctactcattcgcgcagaactcggtcaaccaggcacccttctaggtgatgaccaaatcta
 <object data="https://github.com/Kevinnota/gotcha/blob/main/example_files/summary_stats.pdf" width="1000" height="1000" type='application/pdf'></object>
 
 # <i>Gotcha</i> with costume input files 
-In some cases it might be required to run BOLD with costume input files, such as non-standard marker gene, or in house reference sequences. See here for the costume files that can be used - [custom inputs usage](https://github.com/Kevinnota/gotcha/blob/main/documentation/3.md)
+In some cases it might be required to run <i>gotcha</i> with costume input files, such as non-standard marker gene, or in house reference sequences. See here for the costume files that can be used - [custom inputs usage](https://github.com/Kevinnota/gotcha/blob/main/documentation/3.md)
 
 # Parameters tweaking
 <i>Gotcha</i> has a lot of parameters that can be changed to allow for general usage using for example larger bait/probe sizes. For more details see here - [parameters tweaking](https://github.com/Kevinnota/gotcha/blob/main/documentation/4.md)
