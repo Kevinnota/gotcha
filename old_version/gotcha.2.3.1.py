@@ -87,7 +87,7 @@ par.add_argument('-ds', "--distance", metavar='\b', type=float, default=0.09, he
 par.add_argument('-so', "--trim_seqoverlap", metavar='\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
 par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
-par.add_argument('-dt', "--dust_threshold", metavar='\b', default=1, help='score threshold for low complexity region masking - default is 1')
+par.add_argument('-dt', "--dust_threshold", metavar='\b', default=10, help='score threshold for low complexity region masking - default is 10') #version 2.3.1 changed this to 10, its the number of low clomplexity bases
 
 otr = parser.add_argument_group('OTHER')
 otr.add_argument("-h", "--help", action="help", help="show this help message and exit")
@@ -1010,6 +1010,41 @@ if (args.fast == False):
 	fasta_file.writelines(bait_fasta)
 	fasta_file.close()
 
+	baits=[]
+	for record in (SeqIO.parse("bait.fasta", "fasta")):
+		bait=record.seq.upper()
+		gc=((bait.count("G")+bait.count("C"))/args.baitlength)
+		if(gc<0.30):
+			flag="GC="+str(gc)+"; "+"GC_flag=low;"
+		elif(gc>0.70):
+			flag="GC="+str(gc)+"; "+"GC_flag=high;"
+		else:
+			flag="GC="+str(gc)+"; "+"GC_flag=good;"
+				
+		baits.append(SeqRecord(Seq(str(bait)), id=record.id, description=record.description+" "+flag))
+	SeqIO.write(baits, "tmp_f.fasta", "fasta")
+
+	subprocess.run(["dustmasker", "-in", "tmp_f.fasta", "-out", "tmp.dust.fasta" ,"-outfmt", "fasta", "-window", str(args.baitlength), "-level", "15"], stdout=subprocess.DEVNULL , stderr=subprocess.DEVNULL)
+	
+	flagged_baits=[]
+	file=open("tmp.dust.fasta")
+	for record in (SeqIO.parse(file, "fasta")):
+		seq=record.seq
+		if not str(seq).islower() and not str(seq).isupper():
+			count=0
+			for nucl in seq:
+				if(nucl.islower()):
+					count=count+1
+			if(count>=int(args.dust_threshold)):
+				record.description=record.description+"; dust_flag=failed; low_complex_lenght="+str(count)+";"
+			elif(count<int(args.dust_threshold)):
+				record.description=record.description+"; dust_flag=pass; low_complex_lenght="+str(count)+";"
+		else:
+			record.description=record.description+"; dust_flag=pass;"
+		flagged_baits.append(record)
+	SeqIO.write(flagged_baits, "bait_flagged.fasta", "fasta")
+		
+	
 	summary_stats_file = open("node_selection_stats.tsv", "w")
 	summary_stats_file.writelines(summary_stats)
 	summary_stats_file.close()
@@ -1023,7 +1058,7 @@ if (args.fast == False):
 	tmp_rscript.append("library(data.table)")
 	tmp_rscript.append("library(stringr)")
 	tmp_rscript.append("")
-	tmp_rscript.append("fasta <- readDNAStringSet(\""+ "bait.fasta" +"\")") # read the alignment file
+	tmp_rscript.append("fasta <- readDNAStringSet(\""+ "bait_flagged.fasta" +"\")") # read the alignment file
 	tmp_rscript.append("node_sum<- data.table()")
 	tmp_rscript.append("node_sum<- node_sum[,.(label=gsub(\" [0-9]{1,}:[0-9]{1,}\", \"\", fasta@ranges@NAMES),")
 	tmp_rscript.append("                       position=grep(\":\", str_split(fasta@ranges@NAMES, \" \", simplify = T), value = T))]")

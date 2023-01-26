@@ -2,6 +2,8 @@
 
 This is the repository for the automated workflow for environmental DNA target capture bait design - “<i>Gotcha</i>”. This tool is leveraging a phylogenetic approach, which is expected to be more solid with skewed datasets and incomplete taxon sampling. A manuscript containing a detail description of its functioning will be available here.
 
+Developed by Kevin Nota (kevin_nota@eva.mpg.de) & Giobbe Forni (giobbe.forni@gmail.com)
+
 ## Short description of <i>Gotcha</i>
 By default, Gotcha is using <i>BOLD-CLI</i> for downloading standard barcoding genes such as COI, <i>rbc</i>L, and <i>mat</i>K, followed by filtering and selection of the fragment of the barcoding gene which is covered the most. This will create a “clean” multiple sequence alignment (MSA) from which a gene tree is inferred which is then used to reconstruct ancestral state sequences. These sequences are then processed to only the node/tip sequences required for capturing the fast genetic diversity in the original MSA. The tool allows costume inputs for most major steps, which allows the use of non-standard barcoding genes or manually improve the MSA before building gene trees etc. See below the schematic for <i>gotcha</i>.
 
