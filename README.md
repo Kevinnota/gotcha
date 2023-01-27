@@ -64,6 +64,19 @@ inferring ancestral sequences using genetic code 2
 finding baits of 80 nt with max distance of 0.09 % and tiling 10
 ```
 
+>`output dir:`
+```
+ls -la probes
+drwxrwxr-x  3 public staff   145 Jan 27 13:04 .
+drwxrwxr-x 45 public staff  4096 Jan 27 13:16 ..
+-rw-rw-r--  1 public staff 20532 Jan 27 13:04 circus_3.2.aln #contains the alignmen
+-rw-rw-r--  1 public staff 23671 Jan 27 13:04 circus_3.2.bai # contains the baits
+-rw-rw-r--  1 public staff  1226 Jan 27 13:04 circus_3.2.nwk # contains the gene tree
+-rw-rw-r--  1 public staff   723 Jan 27 13:04 log.txt
+-rw-rw-r--  1 public staff 24553 Jan 27 13:04 summary_stats.pdf
+drwxrwxr-x  2 public staff  4096 Jan 27 15:03 tmp
+
+```
 
 <br>
 
