@@ -1189,6 +1189,19 @@ if args.fast == True :
 		flagged_baits.append(record)
 	SeqIO.write(flagged_baits, "bait.fasta", "fasta")
 
+##################################################################################################### Filer baits on gc-conent, and clapse identical 
+#NEW version 2.3.2
+filtered_baits = [] 
+
+for record in (SeqIO.parse("bait.fasta", "fasta")): 
+	flags = record.description.split(" ")
+	if "GC_flag=good;" and "dust_flag=pass;" in flags:
+		filtered_baits.append(record)
+
+SeqIO.write(filtered_baits, "filtered_baits.fasta", "fasta")
+
+subprocess.run(["cd-hit","-i","filtered_baits.fasta","-o","filtered_baits_collapse.fasta","-c", "1"], stdout=subprocess.DEVNULL , stderr=subprocess.DEVNULL)
+
 ##################################################################################################### summary filtering 4LOG
 
 with open("log.txt", "a+") as log:
@@ -1248,17 +1261,21 @@ with open("log.txt", "a+") as log:
 	log.write("\n\n\t BAITS:" + "\n\n")
 
 	baits = len([1 for line in open("bait.fasta") if line.startswith(">")])
-	log.write("\t " + str(baits) + "\t baits")		
-	
+	log.write("\t " + str(baits) + "\t baits"+ "\n")		
+	baits_filterd = len([1 for line in open("filtered_baits.fasta") if line.startswith(">")]) #NEW version 2.3.2
+	log.write("\t " + str(baits_filterd) + "\t baits passing gc+complexity filter"+ "\n") #NEW version 2.3.2
+	baits_colapse = len([1 for line in open("filtered_baits_collapse.fasta") if line.startswith(">")]) #NEW version 2.3.2
+	log.write("\t " + str(baits_colapse) + "\t unique baits"+ "\n\n") #NEW version 2.3.2
+
 ##################################################################################################### copy output to main dir and clean
 
 def_prb_file = args.out + ".bai"
 os.rename('bait.fasta' , def_prb_file)
 shutil.copy(def_prb_file, '..')
+shutil.copy("log.txt", '..')
 
 if args.fast != True :
 	shutil.copy('summary_stats.pdf', '..')
-	shutil.copy("log.txt", '..')
 	shutil.copy(def_tre_file, '..')
 	shutil.copy(def_aln_file, '..')
 
@@ -1267,7 +1284,7 @@ os.chdir('..')
 if args.verbose == False :
 	pass
 else :
-	shutil.rmtree("tmp/", ignore_errors=True)
+	shutil.rmtree("tmp/", ignore_errors=True) # this is not sovling the problem with folder not being removed
 	#files = glob.glob("tmp/*")
 	#for f in files:
 	#	os.remove(f)

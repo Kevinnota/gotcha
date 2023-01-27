@@ -1,4 +1,4 @@
-# analysis started on 2023-01-24 16:07:06
+# analysis started on 2023-01-27 13:03:49
 
 
 	 INPUTS:
@@ -38,3 +38,6 @@
 	 BAITS:
 
 	 162	 baits
+	 128	 baits passing gc+complexity filter
+	 96	 unique baits
+
