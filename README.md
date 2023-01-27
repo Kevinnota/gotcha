@@ -18,14 +18,19 @@ Here you will find the guide to install gotcha - [install dependencies](https://
 # Quick start to <i>Gotcha</i>
 
 The most default way to run <i>gotcha</i> only requires the -t (--taxa), -m (--marker) and -c (--code) flags. This will download the specified marker from BOLD for the specified taxonomic name, and the [genetic code](https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi) belonging to the marker. The available markers are ["COI-5P", "COI-3P", "rbcL", "matK", and "ITS"]. See the example below, and more detailed for more tutorials for downloading sequences using BOLD [bold download usage](https://github.com/Kevinnota/gotcha/blob/main/documentation/2.md).
+<br>
+<br>
 
-
-<i>The code below will download all sequences from the genus Circus (Harriers).</i>
+>`The code below will download all sequences from the genus Circus (Harriers).`
  
 ```
 python3 gotcha.2.2.2.py -t Circus -m COI-5P -c 2 
 ```
-<i>A short summary of the progress of gotcha is printed in the terminal, see example below. The output of gotcha will stored in a directory "probes" (default, can be specified with -o). The most important statistics are stored in the log.txt file, the baits are printed into the .bai, the clean filtered alignment .aln, and basic statistic and gene tree in the summary_stats.pdf.</i>
+><i>A short summary of the progress of gotcha is printed in the terminal, see example below. The output of gotcha will be stored in a directory "probes" (default, can be specified with -o). The most important statistics are stored in the log.txt file, the baits are printed into the .bai, the clean filtered alignment .aln, and basic statistic and gene tree in the summary_stats.pdf.</i>
+
+<br>
+
+>`printed in terminal`:
 
 ```
 analysis started on 2023-01-24 16:07:06
@@ -58,7 +63,11 @@ inferring tree
 inferring ancestral sequences using genetic code 2
 finding baits of 80 nt with max distance of 0.09 % and tiling 10
 ```
-<i>log.txt</i>
+
+
+<br>
+
+>`log.txt`
 ```
 # analysis started on 2023-01-24 16:07:06
 
@@ -104,10 +113,9 @@ finding baits of 80 nt with max distance of 0.09 % and tiling 10
 	 96	 unique baits
 
 ```
-<i>the fasta file with the bait sequences</i>
 
+>`the baits in the bait.fasta`
 ```
-head Circus.bai
 >BISE004-07 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
 ATAGCCGGCACCGCCCTCAGTCTACTCCTTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
 >node #61 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
@@ -119,7 +127,10 @@ ATAGTCGGCACCGCCCTTAGCCTACTCATTCGCGCAGAACTTGGTCAACCAGGCACACTCCTAGGTGATGACCAAATCTA
 ```
 
 <i>summary_stats.pdf</i>
-<object data="https://github.com/Kevinnota/gotcha/blob/main/example_files/summary_stats.pdf" width="1000" height="1000" type='application/pdf'></object>
+
+<p align="center">
+<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" width="650" height="650" />
+</p>
 
 # <i>Gotcha</i> with costume input files 
 In some cases it might be required to run <i>gotcha</i> with costume input files, such as non-standard marker gene, or in house reference sequences. See here for the costume files that can be used - [custom inputs usage](https://github.com/Kevinnota/gotcha/blob/main/documentation/3.md)
