@@ -20,11 +20,13 @@ The most default way to run <i>gotcha</i> only requires the -t (--taxa), -m (--m
 
 
 <i>The code below will download all sequences from the genus Circus (Harriers).</i>
+ <font size="1"> This is my text number1</font> 
 ```{bash}
 python3 gotcha.2.2.2.py -t Circus -m COI-5P -c 2 
 ```
 <i>A short summary of the progress of gotcha is printed in the terminal, see example below. The output of gotcha will stored in a directory "probes" (default, can be specified with -o). The most important statistics are stored in the log.txt file, the baits are printed into the .bai, the clean filtered alignment .aln, and basic statistic and gene tree in the summary_stats.pdf.</i>
-```{bash}
+
+```
 analysis started on 2023-01-24 16:07:06
 
 downloading COI-5P sequences for taxa Circus
@@ -60,7 +62,7 @@ finding baits of 80 nt with max distance of 0.09 % and tiling 10
 # analysis started on 2023-01-24 16:07:06
 
 
-	 INPUTS:
+	INPUTS:
 
 	 BOLD TAXONOMY 		Circus
 	 GEOGRAPHY 		N
@@ -97,21 +99,22 @@ finding baits of 80 nt with max distance of 0.09 % and tiling 10
 	 BAITS:
 
 	 162	 baits
+	 128	 baits passing gc+complexity filter
+	 96	 unique baits
+
 ```
-<i>the fasta file with the bait sequenecs</i>
+<i>the fasta file with the bait sequences</i>
+
 ```{bash}
 head Circus.bai
-
->BISE004-07 0:80
-atagccggcaccgccctcagtctactccttcgtgcagaactcggtcaaccaggcacccttctaggtgatgaccaaatcta
->node #61 0:80
+>BISE004-07 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
+ATAGCCGGCACCGCCCTCAGTCTACTCCTTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
+>node #61 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
 ATAGCCGGCACCGCCCTCAGTCTACTCATTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
->GBIR9581-19 0:80
-atagccggcaccgccctcagtctactcattcgtgcagaactcggtcaaccaggcacccttctaggtgatgaccaaatcta
->node #36 0:80
+>GBIR9581-19 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
+ATAGCCGGCACCGCCCTCAGTCTACTCATTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
+>node #36 0:80 GC=0.525; GC_flag=good; dust_flag=pass;
 ATAGTCGGCACCGCCCTTAGCCTACTCATTCGCGCAGAACTTGGTCAACCAGGCACACTCCTAGGTGATGACCAAATCTA
->BROMB742-07 0:80
-atagtcggcaccgccctcagtctactcattcgcgcagaactcggtcaaccaggcacccttctaggtgatgaccaaatcta
 ```
 
 <i>summary_stats.pdf</i>
