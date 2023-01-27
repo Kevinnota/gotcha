@@ -129,13 +129,13 @@ ATAGTCGGCACCGCCCTTAGCCTACTCATTCGCGCAGAACTTGGTCAACCAGGCACACTCCTAGGTGATGACCAAATCTA
 >`summary_stats.pdf`
 
 <p align="center">
-<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_850_350.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_A_850_350.svg" width="650" height="150" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_A_850_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_A_850_350.svg" width="800" height="250" />
 
-<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_850_350.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_B_850_350.svg" width="650" height="150" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_B_850_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_B_850_350.svg" width="800" height="250" />
 
-<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_850_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_C_850_350.svg" width="650" height="150" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_C_850_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_C_850_350.svg" width="800" height="250" />
 
-<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_950_950..svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_850_350.svg" width="650" height="650" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_E_950_950.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_E_950_950.svg" width="650" height="650" />
 </p>
 
 # <i>Gotcha</i> with costume input files 
