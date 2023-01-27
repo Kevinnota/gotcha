@@ -7,8 +7,9 @@ Developed by Kevin Nota (kevin_nota@eva.mpg.de) & Giobbe Forni (giobbe.forni@gma
 ## Short description of <i>Gotcha</i>
 By default, Gotcha is using <i>BOLD-CLI</i> for downloading standard barcoding genes such as COI, <i>rbc</i>L, and <i>mat</i>K, followed by filtering and selection of the fragment of the barcoding gene which is covered the most. This will create a “clean” multiple sequence alignment (MSA) from which a gene tree is inferred which is then used to reconstruct ancestral state sequences. These sequences are then processed to only the node/tip sequences required for capturing the fast genetic diversity in the original MSA. The tool allows costume inputs for most major steps, which allows the use of non-standard barcoding genes or manually improve the MSA before building gene trees etc. See below the schematic for <i>gotcha</i>.
 
-![](https://github.com/Kevinnota/gotcha/blob/main/documentation/workflow.jpg)
-
+<p align="center">
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/workflow.jpg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/workflow.jpg" width="650" height="650" />
+</p>
 
 # Install <i>Gotcha</i>
 
@@ -20,8 +21,8 @@ The most default way to run <i>gotcha</i> only requires the -t (--taxa), -m (--m
 
 
 <i>The code below will download all sequences from the genus Circus (Harriers).</i>
- <font size="1"> This is my text number1</font> 
-```{bash}
+ 
+```
 python3 gotcha.2.2.2.py -t Circus -m COI-5P -c 2 
 ```
 <i>A short summary of the progress of gotcha is printed in the terminal, see example below. The output of gotcha will stored in a directory "probes" (default, can be specified with -o). The most important statistics are stored in the log.txt file, the baits are printed into the .bai, the clean filtered alignment .aln, and basic statistic and gene tree in the summary_stats.pdf.</i>
@@ -105,7 +106,7 @@ finding baits of 80 nt with max distance of 0.09 % and tiling 10
 ```
 <i>the fasta file with the bait sequences</i>
 
-```{bash}
+```
 head Circus.bai
 >BISE004-07 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
 ATAGCCGGCACCGCCCTCAGTCTACTCCTTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
