@@ -87,6 +87,8 @@ par.add_argument('-so', "--trim_seqoverlap", metavar='\b', default="", help='tri
 par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
 par.add_argument('-dt', "--dust_threshold", metavar='\b', default=1, help='score threshold for low complexity region masking - default is 1')
+par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
+																						\ndefeault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
 
 otr = parser.add_argument_group('OTHER')
 otr.add_argument("-h", "--help", action="help", help="show this help message and exit")
@@ -623,10 +625,14 @@ for treshold in tqdm(range(0, 101)):
         'finish_position':[finish_position]} 
     fragment_selections = fragment_selections.append(pd.DataFrame(data), ignore_index=True)
  
+fragment_selections.to_csv("size_selection_summary.df", sep="\t") # new version 2.3.2
 
 # loop to find the most optimal fragment lenght
 find_optimal_fragment=False
 i=0
+
+fragment_selections = fragment_selections.loc[fragment_selections['seq_length'] <= args.max_farg_lenght] # new version 2.3.2
+
 while not (find_optimal_fragment==True):
 	if((fragment_selections.loc[i,"number * lenght"]==fragment_selections['number * lenght'].max())==True):
 		#print(fragment_selections.loc[i])
@@ -667,6 +673,7 @@ for i in range(len(input_sequences)):
 
 #Writing the new fasta to tmp folder
 SeqIO.write(new_fasta, "size_selected.fasta", "fasta") #path to the output file
+os.rename("tmp.aln", "no_size_selection.fasta")
 os.rename("size_selected.fasta", "tmp.aln")
 
 print("optimal missing data threshold = "+str(optimal_threshold))
@@ -1075,8 +1082,8 @@ if (args.fast == False):
 	tmp_rscript.append("e <- ggtree(tree_plot, layout=\"fan\")+")
 	tmp_rscript.append("  geom_tippoint(aes(size=N), col=\"red\")+")
 	tmp_rscript.append("  geom_tiplab(offset = 1)+")
-	tmp_rscript.append("  geom_nodepoint(aes(size=N),col=\"black\")+ggtitle(\"Tree with node counts\")+")
-	tmp_rscript.append("  geom_nodelab(nudge_x = 0.1, nudge_y = 0.1, colour=\"darkgreen\")")
+	tmp_rscript.append("  geom_nodepoint(aes(size=N),col=\"black\")+ggtitle(\"Tree with node counts\")")
+	tmp_rscript.append("  #geom_nodelab(nudge_x = 0.1, nudge_y = 0.1, colour=\"darkgreen\")")
 	tmp_rscript.append("")
 	tmp_rscript.append("n.df <- read.delim(\""+ "node_selection_stats.tsv" + "\")") # read summary table from node selection .py
 	tmp_rscript.append("    ")
