@@ -114,7 +114,7 @@ finding baits of 80 nt with max distance of 0.09 % and tiling 10
 
 ```
 
->`the baits in the bait.fasta`
+>`bait.fasta`
 ```
 >BISE004-07 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
 ATAGCCGGCACCGCCCTCAGTCTACTCCTTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
@@ -126,10 +126,16 @@ ATAGCCGGCACCGCCCTCAGTCTACTCATTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
 ATAGTCGGCACCGCCCTTAGCCTACTCATTCGCGCAGAACTTGGTCAACCAGGCACACTCCTAGGTGATGACCAAATCTA
 ```
 
-<i>summary_stats.pdf</i>
+>`summary_stats.pdf`
 
 <p align="center">
-<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" width="650" height="650" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_A_850_350.svg" width="650" height="150" />
+
+<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_B_850_350.svg" width="650" height="150" />
+
+<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_C_850_350.svg" width="650" height="150" />
+
+<img src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_875_400.png.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/example_files/Plot_E_850_350.svg" width="650" height="650" />
 </p>
 
 # <i>Gotcha</i> with costume input files 
