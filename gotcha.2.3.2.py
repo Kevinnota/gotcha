@@ -1078,10 +1078,15 @@ if (args.fast == False):
 	tmp_rscript.append("tree.df$label <- gsub(\"[0-9]{1,}_\", \"\", tree.df$label)")
 	tmp_rscript.append("")
 	tmp_rscript.append("tree.df <- merge(tree.df,  node_sum.dt, by=\"label\", all=T, sort=F)")
+	tmp_rscript.append("bold<- read.delim(\"tmp.bold\")")
+	tmp_rscript.append("for (id in tree.df$label){")
+	tmp_rscript.append("  tree.df$label[tree.df$label==id] <- paste(id, \" species= \", bold$species_name[bold$processid==id][1])")  
+	tmp_rscript.append("}")
+	tmp_rscript.append("")
 	tmp_rscript.append("tree_plot <- as.treedata(tree.df)")
 	tmp_rscript.append("e <- ggtree(tree_plot, layout=\"fan\")+")
 	tmp_rscript.append("  geom_tippoint(aes(size=N), col=\"red\")+")
-	tmp_rscript.append("  geom_tiplab(offset = 1)+")
+	tmp_rscript.append("  geom_tiplab(offset = 1,  size=(4/log(length(tree_plot@phylo$tip.label))+1))+")
 	tmp_rscript.append("  geom_nodepoint(aes(size=N),col=\"black\")+ggtitle(\"Tree with node counts\")")
 	tmp_rscript.append("  #geom_nodelab(nudge_x = 0.1, nudge_y = 0.1, colour=\"darkgreen\")")
 	tmp_rscript.append("")
@@ -1133,6 +1138,10 @@ if (args.fast == False):
 	tmp_rscript.append("plot_grid(a,b,c, ncol = 1, align = \"vh\", axis = \"rltb\")")
 	tmp_rscript.append("plot_grid(e)")
 	tmp_rscript.append("dev.off()")
+	tmp_rscript.append("svg(\"node_tree.svg\",  height = 20, width = 20)")
+	tmp_rscript.append("plot(e)")
+	tmp_rscript.append("dev.off()")
+
 	
 	with open('tmp.R', 'w') as tmp_rscript_file:
 	        for line in tmp_rscript:
