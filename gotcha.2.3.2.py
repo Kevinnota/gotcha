@@ -37,6 +37,7 @@ from Bio.Align.Applications import MafftCommandline
 import ete3 #new v2.2.2
 from ete3 import Tree  #new v2.2.2
 from statistics import mean #new v2.2.2
+import statistics #new v2.3.2
 from collections import Counter #new v2.2.2
  
 ##################################################################################################### parsing arguments and setting variables
@@ -78,25 +79,25 @@ ctm.add_argument('-ca', '--custom_aln', metavar='\b', default="", help='custom n
 ctm.add_argument('-cn', '--custom_nwk', metavar='\b', default="", help='custom newick file - tree can be multifurcating and can lack taxa')
 
 par = parser.add_argument_group('BAITS SEARCH PARAMETERS')
-par.add_argument('-fl', '--filter_len', metavar='\b', default=100, help='minimum amminoacids / nucleotides length - defeault is 100', type=check_positive)
-par.add_argument('-cl', '--collapse', metavar='\b', type=float, default=1, help='percent identity to collapse sequences - defeault is 1')
-par.add_argument('-bl', "--baitlength", metavar='\b', type=int, default=80, help='lenght of the bait sequences - defeault is 80')
-par.add_argument('-tl', "--tiling", metavar='\b', default=10, type=int, help='kmer tiling for ancestral node selection - default is 10')
-par.add_argument('-ds', "--distance", metavar='\b', type=float, default=0.09, help='maximal distance to the ancestral node - defeault is 0.09')
+par.add_argument('-fl', '--filter_len', metavar='\b', default=100, help='minimum amminoacids / nucleotides length - default is 100', type=check_positive)
+par.add_argument('-cl', '--collapse', metavar='\b', type=float, default=1, help='percent identity to collapse sequences - default is 1')
+par.add_argument('-bl', "--baitlength", metavar='\b', type=int, default=80, help='lenght of the bait sequences - default is 80')
+par.add_argument('-tl', "--tiling", metavar='\b', default=30, type=int, help='kmer tiling for ancestral node selection - default is 30') #changed the default from 10 to 30 (think most cases ~3x coverage is alright and for a 80mer, that would be ~30)
+par.add_argument('-ds', "--distance", metavar='\b', type=float, default=0.09, help='maximal distance to the ancestral node - default is 0.09')
 par.add_argument('-so', "--trim_seqoverlap", metavar='\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
 par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
 par.add_argument('-dt', "--dust_threshold", metavar='\b', default=1, help='score threshold for low complexity region masking - default is 1')
 par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
-																						\ndefeault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
+																						\ndefault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
 
 otr = parser.add_argument_group('OTHER')
 otr.add_argument("-h", "--help", action="help", help="show this help message and exit")
 otr.add_argument("-path", default=".", help=argparse.SUPPRESS)
-otr.add_argument('-o', '--out', metavar='\b', default="probes", help='basename of oputput file and folders - defeault is probes')
+otr.add_argument('-o', '--out', metavar='\b', default="probes", help='basename of output file and folders - default is probes')
 otr.add_argument('-v', '--verbose', action='store_false', help='keeps temporary folder and files')
 otr.add_argument('-e', '--erase', action='store_true', help='erases and rewrites a pre existing output folder')
-otr.add_argument('-th', '--threads', metavar='\b', type=check_positive, default=1, help='number of threads used for tree inference - defeault is 1')
+otr.add_argument('-th', '--threads', metavar='\b', type=check_positive, default=1, help='number of threads used for tree inference - default is 1')
 otr.add_argument('--version', action='store_true', help="show program's version number")
 
 args=parser.parse_args()
@@ -584,7 +585,7 @@ for p in tqdm(range(len(input_sequences[0].seq))):
     gaps=gaps.append(pd.DataFrame(data), ignore_index=True)
 
 print("finding maximal sequence fragment")
-for treshold in tqdm(range(0, 101)):
+for treshold in tqdm(range(0, 100)):
     threshold_found=False
     i=0
     
@@ -611,15 +612,16 @@ for treshold in tqdm(range(0, 101)):
             finish_position=0
     count=0
     
+    lenght_no_gaps=[]
     # this counts the number of sequences withing the threshold with no gaps (-)
     for i in range(len(input_sequences)):
         if(len(re.findall("^-|-$|^N|N$", str(input_sequences[i].seq[start_position:finish_position])))==0):
             count+=1
-
-    # writes some summary data into a dataframe - this is used in the next step to select the optimum fragment size
+            lenght_no_gaps.append(len(re.sub("-", "", str(input_sequences[i].seq[start_position:finish_position]))))
+    
     data = {'threshold':[str(treshold)+"%"], 
         'number of sequences':[count], 
-        'seq_length':[len(input_sequences[i].seq[start_position:finish_position])],
+        'seq_length':statistics.mode(lenght_no_gaps),
         'number * lenght':[count*len(input_sequences[i].seq[start_position:finish_position])],
         'start position':[start_position],
         'finish_position':[finish_position]} 
@@ -631,7 +633,7 @@ fragment_selections.to_csv("size_selection_summary.df", sep="\t") # new version 
 find_optimal_fragment=False
 i=0
 
-fragment_selections = fragment_selections.loc[fragment_selections['seq_length'] <= args.max_farg_lenght] # new version 2.3.2
+fragment_selections = fragment_selections.loc[fragment_selections['seq_length'] <= args.max_farg_lenght] # new version 2.3.2 (gaps is a problem here)
 
 while not (find_optimal_fragment==True):
 	if((fragment_selections.loc[i,"number * lenght"]==fragment_selections['number * lenght'].max())==True):
@@ -640,8 +642,10 @@ while not (find_optimal_fragment==True):
 		find_optimal_fragment=True
 		start_position=fragment_selections.loc[i,'start position']
 		finish_position=fragment_selections.loc[i,'finish_position']
+		selected_size=fragment_selections.loc[i,'seq_length']
 	seq_count=fragment_selections.loc[i, 'number of sequences']
 	i=i+1
+
 
 while not (((finish_position-start_position)/3.0).is_integer()):
     finish_position-=1
@@ -676,12 +680,12 @@ SeqIO.write(new_fasta, "size_selected.fasta", "fasta") #path to the output file
 os.rename("tmp.aln", "no_size_selection.fasta")
 os.rename("size_selected.fasta", "tmp.aln")
 
-print("optimal missing data threshold = "+str(optimal_threshold))
+#print("optimal missing data threshold = "+str(optimal_threshold)) #removed v2.3.2
 print("number of sequences retained = "+str(frag_count))
 print("number of sequences omitted = "+str(len(input_sequences)-frag_count))
-print("selected fragment size = "+str(len(input_sequences[i].seq[start_position:finish_position])))
-print("start position = "+str(start_position))
-print("end position = "+str(finish_position))
+print("selected fragment size = "+str(selected_size))
+#print("start position = "+str(start_position)) #removed v2.3.2
+#print("end position = "+str(finish_position)) #removed v2.3.2
 
 num7=str(frag_count)
 
@@ -1080,7 +1084,7 @@ if (args.fast == False):
 	tmp_rscript.append("tree.df <- merge(tree.df,  node_sum.dt, by=\"label\", all=T, sort=F)")
 	tmp_rscript.append("bold<- read.delim(\"tmp.bold\")")
 	tmp_rscript.append("for (id in tree.df$label){")
-	tmp_rscript.append("  tree.df$label[tree.df$label==id] <- paste(id, \" species= \", bold$species_name[bold$processid==id][1])")  
+	tmp_rscript.append("  tree.df$label[tree.df$label==id] <- paste(id, \" species = \", bold$species_name[bold$processid==id][1])")  
 	tmp_rscript.append("}")
 	tmp_rscript.append("")
 	tmp_rscript.append("tree_plot <- as.treedata(tree.df)")
