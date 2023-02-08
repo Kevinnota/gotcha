@@ -8,6 +8,10 @@
 
 #notes Kevin;
     # Fix gap problem with selecting baits (no bait should have a gap)
+	# Fix problem with node selection. There is a problem that sequence close to the root are placed on tips.
+
+# new
+	# tree output with branch lenght. 
 
 import re
 import os
@@ -919,7 +923,7 @@ if (args.fast == False):
 	### --distance
 	#distance = 0.09
 	max_n_miss = int(args.distance*args.baitlength)
-	
+	anc_seq=[]
 	fasta_dict = {}
 	for seq in input_seq:
 	    fasta_dict[str(seq.name)]=str(seq.seq)
@@ -937,7 +941,7 @@ if (args.fast == False):
 	            node_name=re.split(patern, row)[0]
 	            node_seq=re.sub("\n", "", re.sub(" ", "", re.split(patern, row)[1]))
 	            node_seq_dict[str(node_name)] = str(node_seq)
-	
+	            anc_seq.append(">"+node_name+"\n"+node_seq+"\n")
 	node_seq_dict.update(fasta_dict)
 	
 	t=Tree("nodes.phylo.txt",1)
@@ -1015,6 +1019,10 @@ if (args.fast == False):
 	
 	fasta_file = open("bait_tmp.fasta", "w")
 	fasta_file.writelines(bait_fasta)
+	fasta_file.close()
+
+	fasta_file = open("Anc_seqs.fasta", "w")
+	fasta_file.writelines(anc_seq)
 	fasta_file.close()
 
 	baits=[]
