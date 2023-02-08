@@ -622,7 +622,7 @@ for treshold in tqdm(range(0, 100)):
         continue
     data = {'threshold':[str(treshold)+"%"],
         'number of sequences':[count],
-        'seq_length':statistics.mode(lenght_no_gaps),
+        'seq_length':max(Counter(lenght_no_gaps).most_common())[0], #statistics.mode(lenght_no_gaps), 
         'number * lenght':[count*len(input_sequences[i].seq[start_position:finish_position])],
         'start position':[start_position],
         'finish_position':[finish_position]}
@@ -959,6 +959,7 @@ if (args.fast == False):
     use_node="NO"
     bait_fasta=[]
     summary_stats=["Pos\tMean\tmin\tmax\tuniq\tgc\tmin_gc\tmax_gc\n"]
+    progress = tqdm(total=int(seq_len/args.tiling)-2)
     while (pos+args.baitlength) < seq_len:
         taxa_rep = []
         tips_included = []
@@ -984,11 +985,14 @@ if (args.fast == False):
             for seq in list(clade):
                 gap_counter=0
                 tip_seq=fasta_dict[re.sub(".*_", "", seq)][pos:(args.baitlength+pos)]
-                while (tip_seq.count("-") != 0) and (len(re.sub("-", "",tip_seq))!=80): 
+                while (tip_seq.count("-") != 0) and (len(re.sub("-", "",tip_seq))!=80):
                     gap_counter = gap_counter+80-len(re.sub("-", "",tip_seq))
                     tip_seq=fasta_dict[re.sub(".*_", "", seq)][pos:(args.baitlength+pos+gap_counter)]
+                    if (args.baitlength+pos+gap_counter) == seq_len:
+                        continue
                 miss=0
                 gap_counter_all.append(gap_counter)
+
                 for nt in range(len(tip_seq)):
                     anc_str = node_seq_dict[node_name][pos:(args.baitlength+pos+gap_counter)]
                     if tip_seq[nt].upper()!=anc_str[nt].upper() and tip_seq[nt] != "-" :
@@ -1093,7 +1097,8 @@ if (args.fast == False):
               str(min(bait_gc))+"\t"+\
               str(max(bait_gc))+"\n")
         pos=pos+int(args.tiling)
-
+        progress.update()
+    progress.close()    
     fasta_file = open("bait_tmp.fasta", "w")
     fasta_file.writelines(bait_fasta)
     fasta_file.close()
