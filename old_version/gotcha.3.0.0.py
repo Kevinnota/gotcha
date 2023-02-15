@@ -7,12 +7,13 @@
 #####################################################################################
 
 #notes Kevin;
-    # Fix gap problem with selecting baits (no bait should have a gap)
-        # Fix problem with node selection. There is a problem that sequence close to the root are placed on tips.
-        # to fix, for each tip sequence look back into the tree to the closest ancestral node.
+        # Taxon filtering in combination with clustering sequences
 
 # new
-        # tree output with branch lenght.
+        # tree output with branch length.
+        # Fixed gap problem with selecting baits (no bait should have a gap)
+        # Fixed problem with node selection. There is a problem that sequence close to the root are placed on tips.
+        # Fixed, for each tip sequence look back into the tree to the closest ancestral node.
 
 import re
 import os
@@ -70,7 +71,7 @@ man.add_argument('-c', '--code', metavar='\b', help='genetic code - e.g. 1 for p
 bld = parser.add_argument_group('BOLD DOWNLOAD')
 bld.add_argument('-t', '--taxa', metavar='\b', help='input taxa')
 bld.add_argument('-g', '--geo', metavar='\b', default="", help='geographic location of samples')
-bld.add_argument('-ft', '--filter_tax', metavar='\b', default="", choices=['genus', 'family', 'order'], help='can be genus/family/order - defeault is none')
+bld.add_argument('-ft', '--filter_tax', metavar='\b', default="", choices=['species', 'genus', 'family'], help='can be species/genus/family - defeault is none')
 bld.add_argument("-bp", "--boldcli_path", metavar='\b', default="bold-cli", help="path to bold-cli")
 
 ctm = parser.add_argument_group('CUSTOM INPUTS')
@@ -399,6 +400,7 @@ if (args.custom_fna == "") and (args.custom_aln == ""):
                         tmp_1_line=[header, seq]
                         tmp_1_fasta.append(tmp_1_line)
             elif (args.filter_tax == "species"):
+                print(sl[21])
                 if sl[21]:
                     header = (">" + sl[0])
                     seq = sl[71].replace('-','')
@@ -423,7 +425,7 @@ if (args.custom_fna == "") and (args.custom_aln == ""):
 
     num1 = len([1 for line in open("tmp1.fna") if line.startswith(">")])                                                    # count tmp1.fna
     print("#        kept: ", num1)
-
+    quit()
 ##################################################################################################### collapse identical sequences - can enter custom fas
 
 if (args.custom_fna != ""):
