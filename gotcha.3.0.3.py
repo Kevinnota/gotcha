@@ -1407,6 +1407,7 @@ if args.fast != True :
     shutil.copy('summary_stats.pdf', '..')
     shutil.copy(def_tre_file, '..')
     shutil.copy(def_aln_file, '..')
+    shutil.copy("node_tree.svg", '..')
 
 os.chdir('..')
 
