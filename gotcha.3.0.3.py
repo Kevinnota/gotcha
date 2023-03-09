@@ -515,7 +515,7 @@ if (coding == True and args.custom_aln == ""):
     identifiers = set()
     with open('translated4stop.fna', 'r') as translated4stop_fna:
         for seq_record in SeqIO.parse(translated4stop_fna, "fasta"):
-            if "*" in (seq_record.seq):
+            if "*" in (seq_record.seq[0:(len(seq_record.seq)-1)]):
                 identifiers.add(seq_record.id[:-2])
 
     print("removing sequences with stop codons")
@@ -1348,7 +1348,8 @@ with open("log.txt", "a+") as log:
         num2 = len([1 for line in open("tmp2.fna") if line.startswith(">")])
         log.write("\t " + str(num2) + "\t after length filter" + "\n")
 #               num6
-        log.write("\t " + str(num6) + "\t after the removal of sequences with stop codons" + "\n")
+        if coding == True :
+            log.write("\t " + str(num6) + "\t after the removal of sequences with stop codons" + "\n")
 #               num7
         log.write("\t " + str(num7) + "\t after size selection" + "\n")
         if args.trim_seqoverlap != "" and args.trim_seqoverlap != "" :
