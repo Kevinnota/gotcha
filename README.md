@@ -24,7 +24,7 @@ The most default way to run <i>gotcha</i> only requires the -t (--taxa), -m (--m
 >`The code below will download all sequences from the genus Circus (Harriers).`
  
 ```
-python3 gotcha.2.2.2.py -t Circus -m COI-5P -c 2 
+python3 gotcha.py -m "COI-5P" -t Strigiformes -c 2 -o Strigiformes
 ```
 ><i>A short summary of the progress of gotcha is printed in the terminal, see example below. The output of gotcha will be stored in a directory "probes" (default, can be specified with -o). The most important statistics are stored in the log.txt file, the baits are printed into the .bai, the clean filtered alignment .aln, and basic statistic and gene tree in the summary_stats.pdf.</i>
 
@@ -33,122 +33,146 @@ python3 gotcha.2.2.2.py -t Circus -m COI-5P -c 2
 >`printed in terminal`:
 
 ```
-analysis started on 2023-01-24 16:07:06
+Run Gotcha Main
 
-downloading COI-5P sequences for taxa Circus
-#	downloaded:  61
+analysis started on 2023-03-27 16:15:39
+
+downloading COI-5P sequences for taxa Strigiformes
+#        downloaded:  794
 skipping taxonomic filtering
-#	kept:  60
+#        kept:  743
 collapsing identical sequences with a percent identitiy of 1
-#	kept:  43
+#        kept:  478
 removing sequences with non ATGC nucleotides
-#	kept:  33
+#        kept:  360
 filtering sequences with a minimum length of 100
-#	kept:  33
-aligning sequences
+#        kept:  360
 removing sequences with stop codons
-#	kept:  33
-selecting optimal fragment size of 33 sequences with max length of 1548
-calculating missing data
-100%|██████████████████████████████| 1548/1548 [00:00<00:00, 1855.85it/s]
-finding maximal sequence fragment
-100%|████████████████████████████| 101/101 [00:00<00:00, 173.42it/s]
-optimal missing data threshold = 4%
-number of sequences retained = 32
-number of sequences omitted = 1
-selected fragment size = 618
-start position = 84
-end position = 702
+#        kept:  356
+
+selecting optimal fragment size based on 356 :
+#       kept:                   335
+#       omitted:         21
+#       fragment size:   611
+
+
 inferring tree
+
 inferring ancestral sequences using genetic code 2
-finding baits of 80 nt with max distance of 0.09 % and tiling 10
+
+finding baits of 80 nt with max distance of 0.09 % and tiling 30
+Scanning tile : 18it [00:02,  6.23it/s]
+
+
+Gotch run successfully
+
+a totall of 397 baits are needed to capture the selected taxa
+
+
+analysis finished on 2023-03-27 16:16:33
+
 ```
 
 >`output dir:`
 ```
 ls -la probes
-drwxrwxr-x  3 public staff   145 Jan 27 13:04 .
-drwxrwxr-x 45 public staff  4096 Jan 27 13:16 ..
--rw-rw-r--  1 public staff 20532 Jan 27 13:04 circus_3.2.aln #contains the alignmen
--rw-rw-r--  1 public staff 23671 Jan 27 13:04 circus_3.2.bai # contains the baits
--rw-rw-r--  1 public staff  1226 Jan 27 13:04 circus_3.2.nwk # contains the gene tree
--rw-rw-r--  1 public staff   723 Jan 27 13:04 log.txt
--rw-rw-r--  1 public staff 24553 Jan 27 13:04 summary_stats.pdf
-drwxrwxr-x  2 public staff  4096 Jan 27 15:03 tmp
-
+drwxrwxr-x  2 public staff    4096 Mar 27 16:16 ./
+drwxrwxr-x 50 public staff    4096 Mar 27 16:15 ../
+-rw-rw-r--  1 public staff  211033 Mar 27 16:16 Strigiformes.aln
+-rw-rw-r--  1 public staff   13341 Mar 27 16:16 Strigiformes.nwk 
+-rw-rw-r--  1 public staff   55981 Mar 27 16:16 Strigiformes_filtered_baits.fasta
+-rw-rw-r--  1 public staff   55841 Mar 27 16:16 Strigiformes_filtered_uniq_baits.fasta
+-rw-rw-r--  1 public staff   74969 Mar 27 16:16 Strigiformes_raw_baits.fasta
+-rw-rw-r--  1 public staff     800 Mar 27 16:16 log.txt
+-rw-rw-r--  1 public staff 5150703 Mar 27 16:16 node_tree.svg
+-rw-rw-r--  1 public staff   42691 Mar 27 16:16 summary_stats.pdf
 ```
-
 <br>
 
 >`log.txt`
 ```
-# analysis started on 2023-01-24 16:07:06
+# analysis started on 2023-03-27 16:15:39
 
 
-	INPUTS:
+         INPUTS:
 
-	 BOLD TAXONOMY 		Circus
-	 GEOGRAPHY 		N
-	 CUSTOM SEQUENCES 	N
-	 CUSTOM ALIGNMENT 	N
-	 CUSTOM TREE 		N
-	 MARKER 		COI-5P
-	 GEN CODE 		2
-	 FAST MODE 		N
-
-
-	 PARAMETERS:
-
-	 TAXONOMIC FILTER 	N
-	 MIN MARKER LENGTH 	100
-	 MAX MARKER IDENTITY 	1
-	 BAITS LENGTH 		80
-	 BAITS TILING 		10
-	 TRIMAL 		N
-	 DUST TRESHOLD 		1
+         BOLD TAXONOMY          Strigiformes
+         GEOGRAPHY              N
+         CUSTOM SEQUENCES       N
+         CUSTOM ALIGNMENT       N
+         CUSTOM TREE            N
+         MARKER                 COI-5P
+         GEN CODE               2
+         FAST MODE              N
 
 
-	 FILTERING:
+         PARAMETERS:
 
-	 61	 starting sequences
-	 60	 after taxonomic filtering
-	 43	 after identity collapse
-	 33	 after removing sequences with non ATGC nucleotides
-	 33	 after length filter
-	 33	 after the removal of sequences with stop codons
-	 32	 after size selection
+         TAXONOMIC FILTER       N
+         MIN MARKER LENGTH      100
+         MAX MARKER IDENTITY    1
+         BAITS LENGTH           80
+         BAITS TILING           30
+         TRIMAL                 N
+         DUST TRESHOLD          1
 
 
-	 BAITS:
+         FILTERING:
 
-	 162	 baits
-	 128	 baits passing gc+complexity filter
-	 96	 unique baits
+         794     starting sequences
+         743     after taxonomic filtering
+         478     after identity collapse
+         360     removing sequences with non ATGC nucleotides
+         360     after length filter
+         356     the removal of sequences with stop codons
+         335     after size selection
 
+
+         BAITS:
+
+         513     baits
+         398     baits passing gc+complexity filter
+         397     unique baits
+         397     unique clustered baits
+
+# analysis finished on 2023-03-27 16:16:33
 ```
 
 >`bait.fasta`
 ```
->BISE004-07 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
-ATAGCCGGCACCGCCCTCAGTCTACTCCTTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
->node #61 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
-ATAGCCGGCACCGCCCTCAGTCTACTCATTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
->GBIR9581-19 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
-ATAGCCGGCACCGCCCTCAGTCTACTCATTCGTGCAGAACTCGGTCAACCAGGCACCCTTCTAGGTGATGACCAAATCTA
->node #36 0:80 GC=0.525; GC_flag=good; dust_flag=pass;
-ATAGTCGGCACCGCCCTTAGCCTACTCATTCGCGCAGAACTTGGTCAACCAGGCACACTCCTAGGTGATGACCAAATCTA
+>node #668 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTGCTCATCCGAGCTGAACTAGGCCAACCAGGCACACTACTCGGCGATGACCAAATCTACAACGTAATTGT
+>node #338 0:80 GC=0.4625; GC_flag=good; dust_flag=pass;
+GCCCTAAGCCTACTCATCCGAGCTGAACTAGGCCAACCAGGAACACTACTTGGTGATGACCAAATCTACAATGTAATTGT
+>node #666 0:80 GC=0.5125; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTACTAATCCGAGCTGAACTAGGCCAACCAGGAACACTGCTCGGCGATGACCAAATCTACAATGTAATCGT
+>node #662 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTACTTATCCGAGCCGAACTCGGCCAACCAGGGACACTACTAGGCGATGACCAGATCTACAATGTGATCGT
+>node #360 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTACTCATCCGGGCTGAACTTGGTCAGCCCGGCACACTCCTCGGAGACGACCAAATCTATAATGTAATCGT
+>node #492 0:80 GC=0.5125; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTACTCATCCGAGCTGAACTAGGTCAACCCGGAACACTCCTAGGCGATGACCAAATCTACAATGTAGTAGT
+>node #516 0:80 GC=0.4625; GC_flag=good; dust_flag=pass;
+GCCCTAAGCCTCCTAATTCGAGCAGAACTAGGACAACCAGGAACACTCCTAGGAGACGACCAAATCTACAATGTAATTGT
+>node #653 0:80 GC=0.55; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTACTTATTCGAGCCGAACTCGGCCAACCGGGAACACTACTAGGCGACGACCAGATCTACAATGTGATCGT
+>node #353 0:80 GC=0.5875; GC_flag=good; dust_flag=pass;
+GCCCTCAGCCTACTCATCCGGGCCGAACTTGGACAGCCAGGCTCACTCCTCGGAGACGACCAGATCTACAATGTGGTTGT
+>node #356 0:80 GC=0.5375; GC_flag=good; dust_flag=pass;
+GCCCTTAGTTTACTCATCCGGGCCGAGCTTGGTCAGCCCGGAACACTCTTAGGGGATGACCAGATCTACAATGTAGTCGT
+
 ```
 
 >`summary_stats.pdf`
 
 <p align="center">
-<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_A_1200_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_A_1200_350.svg" width="800" height="250" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_A_1200_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_A_1250_350.svg" width="800" height="250" />
 
-<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_B_1200_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_B_1200_350.svg" width="800" height="250" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_B_1200_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_B_1250_350.svg" width="800" height="250" />
 
-<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_C_1200_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_C_1200_350.svg" width="800" height="250" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_C_1200_350.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_C_1250_350.svg" width="800" height="250" />
 
-<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_E_950_950.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_E_950_950.svg" width="650" height="650" />
+<img src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_E_950_950.svg" data-canonical-src="https://github.com/Kevinnota/gotcha/blob/main/documentation/Plot_E_1250_1250.svg" width="800" height="800" />
 </p>
 
 # <i>Gotcha</i> with costume input files 
