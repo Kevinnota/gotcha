@@ -1190,7 +1190,10 @@ def summary_info_r_script():
     tmp_rscript.append("brlen.df <- as_tibble(read.tree(\"brlen.phylo.txt\"))")
     tmp_rscript.append("tree.df$branch.length <- brlen.df$branch.length")
     tmp_rscript.append("")
-    tmp_rscript.append("tree.df <- merge(tree.df,  node_sum.dt, by=\"label\", all=T, sort=F)")
+    tmp_rscript.append("for (node in node_sum.dt$label){")
+    tmp_rscript.append("tree.df$N[tree.df_original$node==node] <- node_sum.dt$N[node_sum.dt$label==node]")
+    tmp_rscript.append("}")
+    tmp_rscript.append("")
     tmp_rscript.append("if(sum(list.files()==\"tmp.bold\")==1){")
     tmp_rscript.append("")
     tmp_rscript.append("bold<- read.delim(\"tmp.bold\")")
@@ -1199,6 +1202,7 @@ def summary_info_r_script():
     tmp_rscript.append("}")
     tmp_rscript.append("}")
     tmp_rscript.append("")
+    tmp_rscript.append("write.tree(as.phylo(tree.df), \"node_tree_branch_lenght.nwk\")")
     tmp_rscript.append("tree_plot <- as.treedata(tree.df)")
     tmp_rscript.append("e <- ggtree(tree_plot, layout=\"fan\")+")
     tmp_rscript.append("  geom_tippoint(aes(size=N), col=\"red\")+")
@@ -1366,7 +1370,9 @@ def clean_up():
 
     if args.fast != True :
         shutil.copy('summary_stats.pdf', '..')
-        shutil.copy(def_tre_file, '..')
+        #shutil.copy(def_tre_file, '..')
+        shutil.copy("node_tree_branch_lenght.nwk", '..')
+        os.rename("node_tree_branch_lenght.nwk", args.out + "_node_tree_branch_lenght.nwk")
         shutil.copy(def_aln_file, '..')
         shutil.copy("node_tree.svg", '..')
 

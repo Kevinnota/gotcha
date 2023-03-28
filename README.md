@@ -51,7 +51,7 @@ removing sequences with stop codons
 #        kept:  356
 
 selecting optimal fragment size based on 356 :
-#       kept:                   335
+#       kept:			 335
 #       omitted:         21
 #       fragment size:   611
 
