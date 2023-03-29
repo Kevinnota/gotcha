@@ -202,6 +202,10 @@ def check_if_all_is_installed():
     if not 1 >= args.bts_collapse >= 0.7:
         print("\n WARNING! A value between 1 and 0.7 should be specified for parameter bts_collapse! \n")
         quit()  
+    
+    gc_thresholds=args.GC_threshold.split("-")
+    if float(min(gc_thresholds))>=0 and float(min(gc_thresholds))<=1 :
+        print("\n WARNING! GC threshold should be a float between 0-1")
 
     if args.trim_seqoverlap != "" and args.trim_resoverlap == "":
         print("\n WARNING! You have to specify both seqoverlap and resoverlap parameters for the trimal step \n")
