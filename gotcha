@@ -94,6 +94,7 @@ par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='tri
 par.add_argument('-dt', "--dust_threshold", metavar='\b', default=1, help='score threshold for low complexity region masking - default is 1')
 par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
                                                                                                                                                                                 \ndefault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
+par.add_argument('-GC', "--GC_threshold", metavar='\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
 par.add_argument('-mc', '--manual_check', action='store_true', help='stops prior to tree inference for a manual check of the alignment')
 
@@ -287,6 +288,7 @@ def check_if_all_is_installed():
     return coding, marker_list
 
 def write_log_file_01():
+    gc_thresholds=args.GC_threshold.split("-")
     with open("log.txt", "a+") as log:
 
         log.write("# analysis started on " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
@@ -343,6 +345,7 @@ def write_log_file_01():
         log.write("\t MAX MARKER IDENTITY \t" + str(args.seq_collapse) + "\n")
         log.write("\t BAITS LENGTH \t\t" + str(args.baitlength) + "\n")
         log.write("\t BAITS TILING \t\t" + str(args.tiling) + "\n")
+        log.write("\t GC THRESHOLD \t\t" + min(gc_thresholds) + "-" + max(gc_thresholds) + "\n")
         if ( args.trim_seqoverlap != "" ) and ( args.trim_resoverlap != "" ):
             log.write("\t SEQ OVERLAP \t\t" + str(args.trim_seqoverlap) + "\n")
             log.write("\t RES OVERLAP \t\t" + str(args.trim_resoverlap) + "\n")
@@ -592,7 +595,7 @@ def size_selection():
     #counting the number of gaps in the alignment file
     gaps = pd.DataFrame()
 
-    print("\nselecting optimal fragment size based on", len(input_sequences),":")# "sequences with max length of",len(input_sequences[0].seq), "\n")
+    print("\nselecting optimal fragment size based on", len(input_sequences),"sequences :")# "sequences with max length of",len(input_sequences[0].seq), "\n")
 
     #print("\nnumber of input sequences =", len(input_sequences))
     #print("max sequences lenght =", len(input_sequences[0].seq))
@@ -975,7 +978,6 @@ def bait_finder():
     node_content = t.get_cached_content(store_attr='name')
 
     pos=0
-    i=1
     seq_len = len(seq)
     use_node="NO"
     bait_fasta=[]
@@ -986,6 +988,7 @@ def bait_finder():
         miss_list_sum_bait = []
         baitmer_list = []
         tip_no_node = []
+        tip_no_node_name = []
         used_nodes_it=[]
         c_baits=0
         for node in t.traverse():
@@ -1003,7 +1006,6 @@ def bait_finder():
             miss_list=[]
             gap_counter_all=[]
             for seq in list(clade):
-                #print("sequence = " + seq)
                 gap_counter=0
                 tip_seq=fasta_dict[re.sub("^\d*_", "", seq)][pos:(args.baitlength+pos)]
                 while (tip_seq.count("-") != 0) and (len(re.sub("-", "",tip_seq))!=80):
@@ -1034,6 +1036,7 @@ def bait_finder():
                         use_node="YES"
                     else:
                         tip_no_node.append(str(tip_seq))
+                        tip_no_node_name.append(str(tip))
 
             if(use_node=="YES"):
                 if gap_counter != 0:
@@ -1052,9 +1055,11 @@ def bait_finder():
                 used_nodes_it.append(node_name)
 
         if len(tip_no_node)!=0:
+            I=0
             for seq in tip_no_node:
+                tip_name=tip_no_node_name[I]
+                I+=1
                 miss_list=[]
-                miss_dic={}
                 for node in used_nodes_it:
                     miss=0
                     if len(seq)!=args.baitlength:
@@ -1074,9 +1079,11 @@ def bait_finder():
                     exit()
                 if min(miss_list)<= max_n_miss :
                     continue
+
                 #loop if the nodes already present are okay to catch the tips.
 
                 miss_list=[]
+                miss_dic={}
                 for key in node_seq_dict.keys():
                     if not "node" in key  :
                         continue
@@ -1090,17 +1097,23 @@ def bait_finder():
                         anc_str=node_seq_dict[key][pos:pos+args.baitlength]
                         for nt in range(len(seq)):
                             if seq[nt].upper()!=anc_str[nt].upper():
-                                
-                                miss=miss+1	                        
+                                miss=miss+1
                     miss_dic.update({key:miss})
 
-            if(len(miss_dic)!=0):
-                needed_key = [key for key in miss_dic.keys() if miss_dic[key] == min(miss_dic.values())]
-                bait_fasta.append(">"+str(needed_key[0])+ " "+ str(pos)+":"+str(pos+args.baitlength) +"\n" +node_seq_dict[needed_key[0]][pos:(args.baitlength+pos)]+"\n")
-                baitmer_list.append(anc_str)
-                c_baits=c_baits+1
-                used_nodes_it.append(needed_key)
+                if(len(miss_dic)!=0):
 
+                    if min(miss_dic.values())>max_n_miss:
+                        bait_fasta.append(">"+tip_name+ " "+ str(pos)+":"+str(pos+args.baitlength) +"\n" +seq+"\n")
+                        baitmer_list.append(anc_str)
+                        c_baits=c_baits+1
+
+                    else:   
+                        needed_key = [key for key in miss_dic.keys() if miss_dic[key] == min(miss_dic.values())]
+                        bait_fasta.append(">"+str(sorted(needed_key)[0])+ " "+ str(pos)+":"+str(pos+args.baitlength) +"\n" +node_seq_dict[sorted(needed_key)[0]][pos:(args.baitlength+pos)]+"\n")
+                        baitmer_list.append(anc_str)
+                        c_baits=c_baits+1
+                        used_nodes_it.append(sorted(needed_key)[0])
+                
         bait_gc=[]
         bait_gc_uniq=[]
         for bait in baitmer_list :
@@ -1130,13 +1143,14 @@ def bait_finder():
 
 def bait_gc_complexity_flagger():
    ## do GC filteing
+    gc_thresholds=args.GC_threshold.split("-")
     baits=[]
     for record in (SeqIO.parse("bait_tmp.fasta", "fasta")):
         bait=record.seq.upper()
         gc=((bait.count("G")+bait.count("C"))/args.baitlength)
-        if(gc<0.30):
+        if(gc<float(min(gc_thresholds))):
             flag="GC="+str(gc)+"; "+"GC_flag=low;"
-        elif(gc>0.70):
+        elif(gc>float(max(gc_thresholds))):
             flag="GC="+str(gc)+"; "+"GC_flag=high;"
         else:
             flag="GC="+str(gc)+"; "+"GC_flag=good;"
@@ -1166,6 +1180,7 @@ def bait_gc_complexity_flagger():
     SeqIO.write(flagged_baits, "bait.fasta", "fasta")
 
 def summary_info_r_script():
+    gc_thresholds=args.GC_threshold.split("-")
     tmp_rscript=[]
     tmp_rscript.append("library(ggplot2)")
     tmp_rscript.append("library(cowplot)")
@@ -1190,9 +1205,10 @@ def summary_info_r_script():
     tmp_rscript.append("brlen.df <- as_tibble(read.tree(\"brlen.phylo.txt\"))")
     tmp_rscript.append("tree.df$branch.length <- brlen.df$branch.length")
     tmp_rscript.append("")
+    tmp_rscript.append("node_sum.dt$label <- gsub(\"[0-9]{1,}_\", \"\", node_sum.dt$label)")
     tmp_rscript.append("tree.df$N <- NA")
     tmp_rscript.append("for (node in node_sum.dt$label){")
-    tmp_rscript.append("tree.df$N[tree.df$node==node] <- node_sum.dt$N[node_sum.dt$label==node]")
+    tmp_rscript.append("tree.df$N[tree.df$label==node] <- node_sum.dt$N[node_sum.dt$label==node]")
     tmp_rscript.append("}")
     tmp_rscript.append("")
     tmp_rscript.append("if(sum(list.files()==\"tmp.bold\")==1){")
@@ -1202,14 +1218,15 @@ def summary_info_r_script():
     tmp_rscript.append("  tree.df$label[tree.df$label==id] <- paste(id, \" species = \", bold$species_name[bold$processid==id][1])")
     tmp_rscript.append("}")
     tmp_rscript.append("}")
+    tmp_rscript.append("tree.df$label <- gsub(\"  species =  NA\" , \"\", tree.df$label)")
     tmp_rscript.append("")
     tmp_rscript.append("write.tree(as.phylo(tree.df), \"node_tree_branch_lenght.nwk\")")
     tmp_rscript.append("tree_plot <- as.treedata(tree.df)")
     tmp_rscript.append("e <- ggtree(tree_plot, layout=\"fan\")+")
     tmp_rscript.append("  geom_tippoint(aes(size=N), col=\"red\")+")
     tmp_rscript.append("  geom_tiplab(align=T, size=(4/log(length(tree_plot@phylo$tip.label))+1))+")
-    tmp_rscript.append("  geom_nodepoint(aes(size=N),col=\"black\")+ggtitle(\"Tree with node counts\")")
-    tmp_rscript.append("  #geom_nodelab(nudge_x = 0.1, nudge_y = 0.1, colour=\"darkgreen\")")
+    tmp_rscript.append("  geom_nodepoint(aes(size=N),col=\"black\")+ggtitle(\"Tree with node counts\")+")
+    tmp_rscript.append("  geom_nodelab(colour=\"blue\", size=2)")
     tmp_rscript.append("")
     tmp_rscript.append("n.df <- read.delim(\""+ "node_selection_stats.tsv" + "\")") # read summary table from node selection .py
     tmp_rscript.append("    ")
@@ -1252,7 +1269,7 @@ def summary_info_r_script():
     tmp_rscript.append("  geom_errorbar(data=n.df, aes(Pos, ymin=min_gc, ymax=max_gc), alpha=0.3)+")
     tmp_rscript.append("  geom_point(data=n.df, aes(Pos, gc), size=3)+")
     tmp_rscript.append("  scale_y_continuous(limits = c(0,1))+")
-    tmp_rscript.append("  geom_hline(yintercept = c(0.75, 0.30), col=\"red\", linetype=\"dashed\")+")
+    tmp_rscript.append("  geom_hline(yintercept = c("+str(min(gc_thresholds))+", "+str(max(gc_thresholds))+"), col=\"red\", linetype=\"dashed\")+")
     tmp_rscript.append("  ylab(\"Mean GC\")+xlab(\"Bait position in the selected fragment\")")
     tmp_rscript.append("")
     tmp_rscript.append("pdf(\"summary_stats.pdf\", width = 8.27, height = 11.69)")
@@ -1282,6 +1299,8 @@ def fast_mode():
     baits=[]
     baitsize=int(args.baitlength)
 
+    gc_thresholds=args.GC_threshold.split("-")
+
     run="TRUE"
     if(run=="TRUE"):
         for record in (SeqIO.parse("tmp.aln", "fasta")):
@@ -1292,9 +1311,9 @@ def fast_mode():
                     print(done)
                 bait=seq[t:(t+baitsize)].upper()
                 gc=((bait.count("G")+bait.count("C"))/baitsize)
-                if(gc<0.30):
+                if(gc<float(min(gc_thresholds))):
                     flag="GC="+str(gc)+"; "+"GC_flag=low;"
-                elif(gc>0.70):
+                elif(gc>float(max(gc_thresholds))):
                     flag="GC="+str(gc)+"; "+"GC_flag=high;"
                 else:
                     flag="GC="+str(gc)+"; "+"GC_flag=good;"
@@ -1353,7 +1372,7 @@ def write_log_file_02():
         baits_colapse = len([1 for line in open("final_clusterd_baits.fasta") if line.startswith(">")])
         log.write("\t " + str(baits_colapse) + "\t unique clustered baits"+ "\n\n") 
         log.write("# analysis finished on " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n\n")
-        print("\n\nGotcha run successfully\n\na totall of " + str(baits_colapse)+ " baits are needed to capture the selected taxa\n")
+        print("\n\nGotcha run successfully\n\na totall of " + str(baits_colapse)+ " unique and filtered baits are produced\n")
 
 def clean_up():
     #def_prb_file = args.out + "raw_.fasta"
@@ -1389,6 +1408,11 @@ def clean_up():
         #os.rmdir("tmp")
 
     print("\nanalysis finished on" , datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"\n")
+
+#bait_finder()
+#bait_gc_complexity_flagger()
+#exit()
+
 
 if __name__ == '__main__':
     print("Run Gotcha Main")
