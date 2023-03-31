@@ -95,6 +95,7 @@ par.add_argument('-dt', "--dust_threshold", metavar='\b', default=1, help='score
 par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
                                                                                                                                                                                 \ndefault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
 par.add_argument('-GC', "--GC_threshold", metavar='\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
+par.add_argument('-ks', "--keep_short_sequences",  help='keep short sequences in size selection step', action='store_true')
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
 par.add_argument('-mc', '--manual_check', action='store_true', help='stops prior to tree inference for a manual check of the alignment')
 
@@ -109,7 +110,8 @@ otr.add_argument('--version', action='store_true', help="show program's version 
 
 args=parser.parse_args()
 
-#args.out = args.out.replace("/","")
+# fix output path so that it can handle "../"
+args.out = re.sub("/$","", args.out)
 
 def check_if_all_is_installed():
 
@@ -204,7 +206,7 @@ def check_if_all_is_installed():
         quit()  
     
     gc_thresholds=args.GC_threshold.split("-")
-    if float(min(gc_thresholds))>=0 and float(min(gc_thresholds))<=1 :
+    if float(min(gc_thresholds))<=0 and float(min(gc_thresholds))>=1 :
         print("\n WARNING! GC threshold should be a float between 0-1")
 
     if args.trim_seqoverlap != "" and args.trim_resoverlap == "":
@@ -229,7 +231,7 @@ def check_if_all_is_installed():
     os.chdir(args.out + "/tmp")
 
     ##################################################################################################### define markers
-
+    marker_list=[]
     if ( args.marker == "coding" ):
         coding = True
     if ( args.marker == "non-coding" ):
@@ -669,7 +671,7 @@ def size_selection():
     i=0
 
     fragment_selections = fragment_selections.loc[fragment_selections['seq_length'] <= args.max_farg_lenght] # new version 2.3.2 (gaps is a problem here)
-
+    
     while not (find_optimal_fragment==True):
         if((fragment_selections.loc[i,"number * lenght"]==fragment_selections['number * lenght'].max())==True):
             #print(fragment_selections.loc[i])
@@ -687,28 +689,51 @@ def size_selection():
         lenght=((finish_position-start_position)/3.0)
 
     #correcting size for the triplet cutoff (prevent sequences being lost due to gaps)
-    count_eng_gap=0
+    #count_eng_gap=0
     frag_count=0
+    
     while not (seq_count<=(frag_count)):
-        count_eng_gap=0
+        #count_eng_gap=0
         frag_count=0
         for i in range(len(input_sequences)):
-            if(len(re.findall("-$", (str(input_sequences[i].seq[start_position:finish_position]))))!=0):
-                count_eng_gap+=1
-            if(len(re.findall("^-|-$|^N|N$", (str(input_sequences[i].seq[start_position:finish_position]))))==0):
+            #if(len(re.findall("-$", (str(input_sequences[i].seq[start_position:finish_position]))))!=0):
+            #    count_eng_gap+=1
+            # ^-|-$|^N|N$
+            if(len(re.findall("$-|$N", (str(input_sequences[i].seq[start_position:finish_position]))))==0):
                 frag_count+=1
-        finish_position=finish_position-3
+        if seq_count>=frag_count :
+            finish_position=finish_position-3
+    
+    frag_count=0
+    while not (seq_count<=(frag_count)):
+        #count_eng_gap=0
+        frag_count=0
+        for i in range(len(input_sequences)):
+            #if(len(re.findall("-$", (str(input_sequences[i].seq[start_position:finish_position]))))!=0):
+            #    count_eng_gap+=1
+            # ^-|-$|^N|N$
+            if(len(re.findall("^-|^N", (str(input_sequences[i].seq[start_position:finish_position]))))==0):
+                frag_count+=1
+        if seq_count>=frag_count :
+            start_position=start_position+3
 
     #Creating new fasta file with original labels but new sequence
     new_fasta=list()
     frag_count=0
     for i in range(len(input_sequences)):
-        if(len(re.findall("^-|-$|^N|N$", str(input_sequences[i].seq[start_position:finish_position])))==0):  #removes all sequences that start with w gap, and sequences that contain N's
+        if args.keep_short_sequences == True : 
             new_seq=SeqRecord(Seq(str(input_sequences[i].seq[start_position:finish_position])),
             id=input_sequences[i].id,
             description="")
             new_fasta.append(new_seq)
             frag_count+=1
+        if args.keep_short_sequences != True : 
+            if(len(re.findall("^-|-$|^N|N$", str(input_sequences[i].seq[start_position:finish_position])))==0): #removes all sequences that start with w gap, and sequences that contain N's
+                new_seq=SeqRecord(Seq(str(input_sequences[i].seq[start_position:finish_position])),
+                id=input_sequences[i].id,
+                description="")
+                new_fasta.append(new_seq)
+                frag_count+=1
 
     #Writing the new fasta to tmp folder
     SeqIO.write(new_fasta, "size_selected.fasta", "fasta") #path to the output file
@@ -871,7 +896,7 @@ def tree_inverence():
         if (coding == False):
 
             with open('tmp.nwk', 'w') as tmp_nwk :
-                subprocess.run(["iqtree" , "-s" , "tmp.aln" , "-nt" , str(args.threads), "-fast"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(["iqtree" , "-s" , "tmp.aln" , "-nt" , str(args.threads), "-fast"], stdout=tmp_nwk, stderr=subprocess.DEVNULL)
 
             def_tre_file = args.out + ".nwk"
             os.rename('tmp.aln.treefile' , def_tre_file)
@@ -951,7 +976,6 @@ def bait_finder():
     print("finding baits of", args.baitlength, "nt with max distance of", args.distance,"% and tiling",args.tiling)
 
     input_seq = list(SeqIO.parse(args.out + ".aln", "fasta"))
-
     max_n_miss = int(args.distance*args.baitlength)
     anc_seq=[]
     fasta_dict = {}
