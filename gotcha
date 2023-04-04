@@ -446,6 +446,7 @@ def bold_download():
         log.write("\t " + str(num1) + "\t after taxonomic filtering" + "\n")
     log.close()
 
+# put this after size selection
 def seq_quality_filters():
     if (args.custom_fna != ""):
         print("custom sequences detected\n")
@@ -539,7 +540,7 @@ def seq_quality_filters():
         identifiers = set()
         with open('translated4stop.fna', 'r') as translated4stop_fna:
             for seq_record in SeqIO.parse(translated4stop_fna, "fasta"):
-                if "*" in (seq_record.seq[0:(len(seq_record.seq)-1)]):
+                if "*" in (seq_record.seq[0:(len(seq_record.seq)-2)]):
                     identifiers.add(seq_record.id[:-2])
 
         print("removing sequences with stop codons")
@@ -973,15 +974,18 @@ def tree_inverence():
     return def_tre_file, def_aln_file
 
 def bait_finder():
+    gc_thresholds=args.GC_threshold.split("-")
     print("finding baits of", args.baitlength, "nt with max distance of", args.distance,"% and tiling",args.tiling)
 
     input_seq = list(SeqIO.parse(args.out + ".aln", "fasta"))
     max_n_miss = int(args.distance*args.baitlength)
     anc_seq=[]
     fasta_dict = {}
+    tip_list=[]
     for seq in input_seq:
         fasta_dict[str(seq.name)]=str(seq.seq)
-
+        tip_list.append(seq.id)
+                        
     file = open("rst")
     patern=r" {3,}"
     node_seq_dict = {}
@@ -1010,16 +1014,36 @@ def bait_finder():
     use_node="NO"
     bait_fasta=[]
     summary_stats=["Pos\tMean\tmin\tmax\tuniq\tgc\tmin_gc\tmax_gc\n"]
-    progress=tqdm(total=None, desc="Scanning tile ")
+    progress=tqdm(total=None, desc="Tile number ")
+    iii=0
+
+    def get_seq(dict, key):
+        seq_out=str()
+        for value in ungap_pos:
+            seq_out=seq_out+dict[key][value]
+        return(seq_out)
+
+    def find_ungaped_seq(start, key):
+        gap_counter=0
+        tip_seq=fasta_dict[key][start:(args.baitlength+start)]
+        while (tip_seq.count("-") != 0) and (len(re.sub("-", "",tip_seq))!=args.baitlength):
+            gap_counter = gap_counter+(args.baitlength-len(re.sub("-", "",tip_seq)))
+            tip_seq=fasta_dict[key][start:(args.baitlength+start+gap_counter)]
+            if (args.baitlength+start+gap_counter) >= seq_len:
+                break
+        return(tip_seq, gap_counter)  
+
     while (pos+args.baitlength) < seq_len:
+        
         tips_included = []
+        tips_included_2 = []
         miss_list_sum_bait = []
         baitmer_list = []
-        tip_no_node = []
-        tip_no_node_name = []
         used_nodes_it=[]
         c_baits=0
+        gap_counter=0
         for node in t.traverse():
+            bv=0
             if not node.is_leaf():
                 node_name ="node #"+str(node.name)
                 level="NODE"
@@ -1029,28 +1053,38 @@ def bait_finder():
                 level="TIP"
 
             anc_str= node_seq_dict[node_name][pos:(args.baitlength+pos)]
-
             clade=node_content[node]
             miss_list=[]
             gap_counter_all=[]
             for seq in list(clade):
                 gap_counter=0
-                tip_seq=fasta_dict[re.sub("^\d*_", "", seq)][pos:(args.baitlength+pos)]
-                while (tip_seq.count("-") != 0) and (len(re.sub("-", "",tip_seq))!=80):
-                    gap_counter = gap_counter+(80-len(re.sub("-", "",tip_seq)))
-                    tip_seq=fasta_dict[re.sub("^\d*_", "", seq)][pos:(args.baitlength+pos+gap_counter)]
-                    if (args.baitlength+pos+gap_counter) >= seq_len:
-                        break
-                miss=0
+                tip_seq, gap_counter = find_ungaped_seq(pos, re.sub("^\d*_", "", seq))
+            
                 gap_counter_all.append(gap_counter)
 
+            if(min(gap_counter_all))!=max(gap_counter_all):
+                continue
+
+            ungap_pos=[]
+            for nt in range(pos, args.baitlength+pos+gap_counter):
+                gaps=[]
+                for seq in list(clade):
+                    gaps.append(fasta_dict[re.sub("^\d*_", "", seq)][nt])
+                if gaps.count("-") == 0:
+                    ungap_pos.append(nt)
+
+            anc_str = get_seq(node_seq_dict, node_name)
+
+            for seq in list(clade):
+                tip_seq=get_seq(fasta_dict, re.sub("^\d*_", "", seq))
+                miss=0
                 for nt in range(len(tip_seq)):
-                    anc_str = node_seq_dict[node_name][pos:(args.baitlength+pos+gap_counter)]
-                    if tip_seq[nt].upper()!=anc_str[nt].upper() and tip_seq[nt] != "-" :
+                    if tip_seq[nt].upper()!= anc_str[nt].upper() and tip_seq[nt] != "-" :
                         miss=miss+1
                 miss_list.append(miss)
-
-            if(max(miss_list)<=max_n_miss) and len(Counter(gap_counter_all).keys())==1 :
+            
+            gc=((anc_str.count("G")+anc_str.count("C"))/args.baitlength)
+            if(max(miss_list)<=max_n_miss) and len(Counter(gap_counter_all).keys())==1 and gc>=float(min(gc_thresholds)) and gc<=float(max(gc_thresholds)) : #gc
                 if level == "NODE":
                     clade_tips=node.get_leaf_names()
                 elif level == "TIP":
@@ -1059,30 +1093,30 @@ def bait_finder():
                     if tip in tips_included :
                         continue
                     else:
-                        tips_included.append(str(tip))
+                        tips_included.append(tip)
+                        tips_included_2.append(re.sub("[0-9].*_","", tip))
                     if level == "NODE":
                         use_node="YES"
-                    else:
-                        tip_no_node.append(str(tip_seq))
-                        tip_no_node_name.append(str(tip))
 
-            if(use_node=="YES"):
-                if gap_counter != 0:
-                    Anc_gap_correct=str()
-                    anc_str=node_seq_dict[node_name][pos:(args.baitlength+pos+gap_counter)]
-                    for nuc in range(len(tip_seq)):
-                        if(tip_seq[nuc]!="-"):
-                            Anc_gap_correct=Anc_gap_correct+anc_str[nuc]
-                    anc_str=Anc_gap_correct
-
-                bait_fasta.append(">"+node_name+ " "+ str(pos)+":"+str(pos+args.baitlength) +"\n" +anc_str+"\n")
+            if(use_node=="YES"):                
+                bait_fasta.append(">"+node_name+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1])  +"\n" +anc_str+"\n")
                 baitmer_list.append(anc_str)
                 use_node="NO"
                 miss_list_sum_bait=miss_list_sum_bait+miss_list
                 c_baits=c_baits+1
                 used_nodes_it.append(node_name)
 
-        if len(tip_no_node)!=0:
+        tip_no_node = []
+        tip_no_node_name = []
+        for tip in tip_list:
+            if tip not in tips_included_2:
+                tip_no_node.append(get_seq(fasta_dict, tip)) 
+                tip_no_node_name.append(str(tip))
+        
+        if len(tip_no_node_name) > 200 :
+            progress_int_2=tqdm(total=len(tip_no_node_name), desc="Finding nearest ancestral node ")
+        
+        if len(tip_no_node_name)!=0:
             I=0
             for seq in tip_no_node:
                 tip_name=tip_no_node_name[I]
@@ -1091,64 +1125,83 @@ def bait_finder():
                 for node in used_nodes_it:
                     miss=0
                     if len(seq)!=args.baitlength:
-                        anc_str=node_seq_dict[node][pos:pos+len(seq)]
+                        anc_str=get_seq(node_seq_dict, node)
                         for nt in range(len(seq)):
                             if seq[nt].upper()!=anc_str[nt].upper() and seq[nt] != "-":
                                 miss=miss+1
                     else:
-                        anc_str=node_seq_dict[node][pos:pos+args.baitlength]
+                        anc_str=get_seq(node_seq_dict, node)
                         for nt in range(len(seq)):
                             if seq[nt].upper()!=anc_str[nt].upper():
                                  miss=miss+1
 
                     miss_list.append(miss)
+
                 if len(miss_list)==0:
                     print("Error in node fiding, tip sequences only has gaps, check allingment")    
                     exit()
                 if min(miss_list)<= max_n_miss :
                     continue
 
-                #loop if the nodes already present are okay to catch the tips.
-
                 miss_list=[]
                 miss_dic={}
+
+                if "-" in seq :
+                    tip_seq, gap_counter = find_ungaped_seq(pos, tip_name)
+                    ungap_pos=[]
+                    for nt in range(len(tip_seq)): 
+                        if tip_seq[nt] != "-" :
+                            ungap_pos.append(nt+pos)   
+                    seq  = get_seq(fasta_dict, tip_name)
+
                 for key in node_seq_dict.keys():
-                    if not "node" in key  :
+                    if not "node" in key :
                         continue
                     miss=0
                     if len(seq)!=args.baitlength:
-                        anc_str=node_seq_dict[key][pos:(pos+len(seq))]
-                        for nt in range(len(seq)):
-                            if seq[nt].upper()!=anc_str[nt].upper() and seq[nt] != "-":
-                                miss=miss+1
+                        anc_str=get_seq(node_seq_dict, key)
+                        gc=((anc_str.count("G")+anc_str.count("C"))/args.baitlength)
+                        if gc>=float(min(gc_thresholds)) and gc<=float(max(gc_thresholds)): 
+                            for nt in range(len(seq)):
+                                if seq[nt].upper()!=anc_str[nt].upper() and seq[nt] != "-":
+                                    miss=miss+1
                     else:
-                        anc_str=node_seq_dict[key][pos:pos+args.baitlength]
-                        for nt in range(len(seq)):
-                            if seq[nt].upper()!=anc_str[nt].upper():
-                                miss=miss+1
-                    miss_dic.update({key:miss})
+                        anc_str=get_seq(node_seq_dict, key)
+                        gc=((anc_str.count("G")+anc_str.count("C"))/args.baitlength)
+                        if gc>=float(min(gc_thresholds)) and gc<=float(max(gc_thresholds)): 
+                            for nt in range(len(seq)):
+                                if seq[nt].upper()!=anc_str[nt].upper():
+                                    miss=miss+1
 
+                    miss_dic.update({key:miss})
                 if(len(miss_dic)!=0):
 
                     if min(miss_dic.values())>max_n_miss:
-                        bait_fasta.append(">"+tip_name+ " "+ str(pos)+":"+str(pos+args.baitlength) +"\n" +seq+"\n")
+                        bait_fasta.append(">"+tip_name+ " "+ str(ungap_pos[0]+1)+":"+str(ungap_pos[args.baitlength-1])+"\n" +seq+"\n")
                         baitmer_list.append(anc_str)
                         c_baits=c_baits+1
 
                     else:   
                         needed_key = [key for key in miss_dic.keys() if miss_dic[key] == min(miss_dic.values())]
-                        bait_fasta.append(">"+str(sorted(needed_key)[0])+ " "+ str(pos)+":"+str(pos+args.baitlength) +"\n" +node_seq_dict[sorted(needed_key)[0]][pos:(args.baitlength+pos)]+"\n")
+                        bait_fasta.append(">"+str(sorted(needed_key)[0])+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1]) + "\n" +get_seq(node_seq_dict, sorted(needed_key)[0])+"\n")
                         baitmer_list.append(anc_str)
                         c_baits=c_baits+1
                         used_nodes_it.append(sorted(needed_key)[0])
-                
+                if len(tip_no_node_name) > 200 :
+                    progress_int_2.update()
+            if len(tip_no_node_name) > 200 :
+                progress_int_2.close()
+
         bait_gc=[]
         bait_gc_uniq=[]
         for bait in baitmer_list :
             if not bait in bait_gc_uniq:
                 bait_gc.append((bait.upper().count("G")+bait.upper().count("C"))/args.baitlength)
                 bait_gc_uniq.append(bait)
-
+        if len(bait_gc)==0:
+            print("pos in alignment no suitible baits = "+ str(pos)+":"+str(args.baitlength+pos+gap_counter))
+            bait_gc.append(float(0))
+            miss_list_sum_bait.append(float(0))
 
         summary_stats.append(str(pos)+":"+str(args.baitlength+pos)+"\t"+\
               str(mean(miss_list_sum_bait))+"\t"+ \
@@ -1218,7 +1271,7 @@ def summary_info_r_script():
     tmp_rscript.append("library(data.table)")
     tmp_rscript.append("library(stringr)")
     tmp_rscript.append("")
-    tmp_rscript.append("fasta <- readDNAStringSet(\""+ "bait_tmp.fasta" +"\")") # read the alignment file
+    tmp_rscript.append("fasta <- readDNAStringSet(\""+ "final_clusterd_baits.fasta" +"\")") # read the alignment file
     tmp_rscript.append("node_sum<- data.table()")
     tmp_rscript.append("node_sum<- node_sum[,.(label=gsub(\" [0-9]{1,}:[0-9]{1,}.*\", \"\", fasta@ranges@NAMES),")
     tmp_rscript.append("                       position=str_split_fixed(gsub(\"node #\", \"node_#\", fasta@ranges@NAMES), \" \", 3)[,2])]")
@@ -1437,9 +1490,9 @@ def clean_up():
 
     print("\nanalysis finished on" , datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"\n")
 
-#bait_finder()
-#bait_gc_complexity_flagger()
-#exit()
+bait_finder()
+bait_gc_complexity_flagger()
+exit()
 
 
 if __name__ == '__main__':
@@ -1505,7 +1558,6 @@ if __name__ == '__main__':
         def_tre_file, def_aln_file = tree_inverence()
         bait_finder()
         bait_gc_complexity_flagger()
-        summary_info_r_script()
 
 
     #####################################################################
@@ -1524,5 +1576,7 @@ if __name__ == '__main__':
     bait_gc_complexity_filter()
     final_clustering()
     write_log_file_02()
+    if (args.fast == False):
+        summary_info_r_script()
     clean_up()
     #####################################################################
