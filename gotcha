@@ -481,10 +481,10 @@ def seq_quality_filters():
 
         for record in SeqIO.parse("tmp2a.fna", "fasta"):
     #               if record.seq.count('N') == 0:
-            #matches = ['B','D','E','F','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','b','d','e','f','h','i','j','k','l','m','n','o','p','q','r','s','u','v','w','x','y','z']
-            matches = ['A', 'T', 'A', 'C']
+            matches = ['B','D','E','F','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','b','d','e','f','h','i','j','k','l','m','n','o','p','q','r','s','u','v','w','x','y','z']
             if any(x in record.seq.upper() for x in matches):
                 selected_seqs_ns.append(record)
+
         nseq=(len(selected_seqs_ns))
         SeqIO.write(selected_seqs_ns, tmp2b_fna , "fasta")
         tmp2b_fna.close()
