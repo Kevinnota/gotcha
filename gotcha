@@ -1613,7 +1613,7 @@ def clean_up():
 
     if args.fast == True :    
         def_aln_file = args.out + ".aln"
-        os.rename("size_selected.fasta", def_aln_file)
+        os.rename("tmp.aln", def_aln_file)
         shutil.copy(def_aln_file, '..')
         
     os.chdir('..')
@@ -1794,6 +1794,7 @@ def calculate_mismatches():
                                              "NA" +"\n")
                 progress.update()  
                 continue
+            
 
 
             miss_min = 0
@@ -1801,12 +1802,19 @@ def calculate_mismatches():
                 the_read = simulated_dict[key]
                 tile_start = int([x for x in bait.split(" ") if ":" in x][0].split(":")[0])
                 bait_read_pos = len(the_read)-(tile_start-pos)
-                (tile_start-pos)
+                
                 if (bait_read_pos<0) or ((bait_read_pos>len(the_read) + (args.baitlength-args.min_overlap))):
                     continue
                 if (bait_read_pos<args.min_overlap):
                     continue
                 tile_correction = (tile_start-pos)+1
+
+                #print("\n")
+                #print("pos = " + str(pos))
+                #print("tile = " + str(tile_start))
+                #print('the_read = ' + the_read)
+                #print('bait_seq = ' + bait_dict[bait][0:(len(the_read)-tile_correction)] )
+
                 if tile_correction>0:
                     bait_seq=bait_dict[bait][0:(len(the_read)-tile_correction)] 
                     the_read=the_read[tile_correction:len(the_read)]
@@ -1828,12 +1836,17 @@ def calculate_mismatches():
                         the_read=the_read[0:len(bait_seq)]
                     elif len(bait_seq) > len(the_read):
                         bait_seq=the_read[0:len(the_read)] 
-
+                
                 ham_dist_list.append(str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))))
                 bait_list.append(bait)
                 miss_min = max(hamming_dist(bait_seq, the_read), miss_min)
                 ham_dist_list_dict.update({str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))):[the_read, bait,bait_seq]})
-                
+                #print('cor read = ' + the_read)
+                #print('cor bait = ' + bait_seq)
+
+
+            #print(sorted(ham_dist_list,reverse=True))
+            #print(ham_dist_list_dict)    
             if len(ham_dist_list) != 0:
                 dist_value = sorted(ham_dist_list,reverse=True)[0]
                 for I in range(len(bait_list)):
