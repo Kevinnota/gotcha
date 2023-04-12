@@ -93,7 +93,7 @@ par.add_argument('-tl', "--tiling", metavar='\b', default=30, type=int, help='km
 par.add_argument('-ds', "--distance", metavar='\b', type=float, default=0.09, help='maximal distance to the ancestral node - default is 0.09')
 par.add_argument('-so', "--trim_seqoverlap", metavar='\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
 par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
-par.add_argument('-dt', "--dust_threshold", metavar='\b', default=1, help='score threshold for low complexity region masking - default is 1')
+par.add_argument('-dt', "--dust_threshold", metavar='\b', default=10, help='score threshold for low complexity region masking - default is 10')
 par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
                                                                                                                                                                                 \ndefault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
 par.add_argument('-GC', "--GC_threshold", metavar='\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
@@ -482,7 +482,7 @@ def seq_quality_filters():
         for record in SeqIO.parse("tmp2a.fna", "fasta"):
     #               if record.seq.count('N') == 0:
             matches = ['B','D','E','F','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','b','d','e','f','h','i','j','k','l','m','n','o','p','q','r','s','u','v','w','x','y','z']
-            if any(x in record.seq.upper() for x in matches):
+            if not any(x in record.seq.upper() for x in matches):
                 selected_seqs_ns.append(record)
 
         nseq=(len(selected_seqs_ns))
@@ -1049,7 +1049,7 @@ def bait_finder():
     t=Tree("nodes.phylo.txt",1)
     node_content = t.get_cached_content(store_attr='name')
 
-    pos= 0
+    pos= 0  
     seq_len = len(seq)
     use_node="NO"
     bait_fasta=[]
@@ -1078,6 +1078,8 @@ def bait_finder():
             bar_nam.update()
 
     while (pos+args.baitlength) < seq_len:
+
+        used_baits_dict={}
         
         tips_included = []
         tips_included_2 = []
@@ -1157,39 +1159,79 @@ def bait_finder():
                 miss_list_sum_bait=miss_list_sum_bait+miss_list
                 c_baits=c_baits+1
                 used_nodes_it.append(node_name)
-
+                used_baits_dict.update({node_name+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1]):anc_str})
 
         tip_no_node = []
         tip_no_node_name = []
+        gap_cor_tip_dict={}
         for tip in tip_list:
             if tip in tips_included_2:
                 continue
-            if tip_seq in tip_no_node:
+            #tip_no_node.append(get_seq(fasta_dict, tip))
+
+            gap_cor_tip = re.sub("-", "", fasta_dict[tip][pos:pos+args.baitlength])
+            
+            end_of_seq=False
+            gap_counter=0
+            #print("seq  = " + gap_cor_tip)
+            if(gap_cor_tip != args.baitlength):
+                while len (gap_cor_tip) < (args.baitlength-1) :
+                    gap_counter+=1
+                    gap_cor_tip = re.sub("-", "", fasta_dict[tip][pos:(pos+args.baitlength+gap_counter)])
+                    #print(gap_cor_tip)
+                    #print(len (gap_cor_tip))
+                    if pos+args.baitlength+gap_counter > seq_len:
+                        end_of_seq=True
+                        break
+                    #print("\ntip seq : " + gap_cor_tip)
+                    #print("seq len " + str(len(gap_cor_tip)))
+
+            if gap_cor_tip.upper() in tip_no_node:
+                continue
+            if end_of_seq == True :
                 continue
             
-            tip_no_node.append(get_seq(fasta_dict, tip))
+            ungap_pos=[]
+            for nt in range(pos, (pos+args.baitlength+gap_counter)):
+                if fasta_dict[tip][nt] != "-" :
+                    ungap_pos.append(nt)
+
+
+            if len(ungap_pos) != args.baitlength:# hack not sure why some areas behave like this, looks like it has somehting to do with ending on a gap
+                ungap_pos.append(pos+args.baitlength+gap_counter+1)
+            #print(len(ungap_pos))
+            #print("\n")
+            #print(ungap_pos)
+            #print(len(ungap_pos[0:(args.baitlength)-1]))
+            #print("size = "+str(len(ungap_pos)))
+
+            tip_no_node.append(gap_cor_tip.upper())
             tip_no_node_name.append(str(tip))
+            
+            gap_cor_tip_dict.update({tip:ungap_pos})
+
+            # here the tips sequences without node need to become ungapped based on the starting position.
         progress_int_2=[]
         if len(tip_no_node_name) > 200 :
             progress_int_2=tqdm(total=len(tip_no_node_name)+1, desc=str("Finding nearest ancestral node ; pos = " + str(pos)))
         
-
-        # look at the list of sequences, and only take uniq 80'mers.
+        # loop through the tips with no node yet to find a good pairing among the nodes already used.
         if len(tip_no_node_name)!=0:
             I=0
+            k=0
             for seq in tip_no_node:
                 tip_name=tip_no_node_name[I]
                 I+=1
                 miss_list=[]
-                for node in used_nodes_it:
+                for node in used_baits_dict.keys():
                     miss=0
                     if len(seq)!=args.baitlength:
-                        anc_str=get_seq(node_seq_dict, node)
+                        anc_str=used_baits_dict[node]
                         for nt in range(len(seq)):
                             if seq[nt].upper()!=anc_str[nt].upper() and seq[nt] != "-":
                                 miss=miss+1
                     else:
-                        anc_str=get_seq(node_seq_dict, node)
+                        anc_str=used_baits_dict[node]
                         if len(anc_str) != args.baitlength:
                             continue
                         for nt in range(len(seq)):
@@ -1199,24 +1241,16 @@ def bait_finder():
             
                 if len(miss_list)==0:
                     miss_list=[999]
-
+            
                 if min(miss_list)<= max_n_miss:
                     update_progress_bar(progress_int_2, len(tip_no_node_name))
                     continue
                 
+                #If no node is present, this loop will continue to look at all ancestral sequences to find the right node.
+
                 miss_list=[]
                 miss_dic={}
                 seqs_already_done=[]
-                if "-" in seq :
-                    tip_seq, gap_counter = find_ungaped_seq(pos, tip_name)
-                    ungap_pos=[]
-                    for nt in range(len(tip_seq)): 
-                        if tip_seq[nt] != "-" :
-                            ungap_pos.append(nt+pos)   
-                    seq  = get_seq(fasta_dict, tip_name)
-                    if len(ungap_pos) != args.baitlength:
-                        continue
-
                 if not seq in seqs_already_done:
                     seqs_already_done.append(seq)
  
@@ -1229,37 +1263,44 @@ def bait_finder():
                         continue
                     
                     miss=0
-                    
+                    if len(seq) == 0 :
+                        continue
+
                     if len(seq)!=args.baitlength:
-                        print("\n"+key)
-                        print("seq=" + seq)  
                         anc_str=get_seq(node_seq_dict, key)
-                        print("anc_str = " + anc_str)
-                        quit()
+                        
                         gc=((anc_str.upper().count("G")+anc_str.upper().count("C"))/args.baitlength)
                         if gc>=float(min(gc_thresholds)) and gc<=float(max(gc_thresholds)): 
                             for nt in range(len(seq)):
                                 if seq[nt].upper()!=anc_str[nt].upper() and seq[nt] != "-":
                                     miss=miss+1
+                        else:
+                            continue
                     else:
                         if len(anc_str) != args.baitlength:
                             continue
+                        ungap_pos=gap_cor_tip_dict[tip_name]
                         anc_str=get_seq(node_seq_dict, key)
                         gc=((anc_str.upper().count("G")+anc_str.upper().count("C"))/args.baitlength)
                         if gc>=float(min(gc_thresholds)) and gc<=float(max(gc_thresholds)): 
                             for nt in range(len(seq)):
                                 if seq[nt].upper()!=anc_str[nt].upper():
                                     miss=miss+1
- 
-                    miss_dic.update({key:miss})
+                        else:
+                            continue
 
+                    miss_dic.update({key:miss})
                 if(len(miss_dic)!=0):
                     if min(miss_dic.values())>max_n_miss:
-                        bait_fasta.append(">"+tip_name+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1])+"\n" +seq+"\n")
+                        ungap_pos = gap_cor_tip_dict[tip_name]
+                        #print(ungap_pos)
+                        #print(len(ungap_pos))
+                        #print(get_seq(fasta_dict, tip_name).upper())
+                        bait_fasta.append(">"+tip_name+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1])+"\n" +get_seq(fasta_dict, tip_name).upper()+"\n")
                         baitmer_list.append(anc_str)
                         c_baits=c_baits+1
-
                     else:  
+                        ungap_pos = gap_cor_tip_dict[tip_name]
                         needed_key = [key for key in miss_dic.keys() if miss_dic[key] == min(miss_dic.values())]
                         bait_fasta.append(">"+str(sorted(needed_key)[0])+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1]) + "\n" +get_seq(node_seq_dict, sorted(needed_key)[0])+"\n")
                         baitmer_list.append(anc_str)
@@ -1590,7 +1631,7 @@ def clean_up():
 def hamming_dist(bait, read): 
     distance = 0
     for i in range(len(bait)):
-        if bait[i] != read[i]:
+        if bait[i].upper() != read[i].upper():
             distance += 1
     return(1-(distance/len(read)))
 
@@ -1645,15 +1686,19 @@ def make_simulated_dict_costume():
         if pos+read_length >= len(fasta_dict[ran_seq]) :
             continue
         
-        simulated_dict.update({ran_seq+"_sim_read_"+str(count)+"_start="+str(pos):fasta_dict[ran_seq][pos:(pos)+read_length]})
+        simulated_dict.update({ran_seq+" sim_read_"+str(count)+"_start="+str(pos):fasta_dict[ran_seq][pos:(pos)+read_length]})
         count+=1
         progress.update()
     progress.close()
+
+
+
     return(simulated_dict)       
 
 def make_bait_dict():
     bait_dict={}
     baits = open(args.out + "_filtered_uniq_baits.fasta")
+    #baits = open(args.out + "_raw_baits.fasta")
     for row in baits :
         if ">" in row:
             header = re.sub("\n|>", "", row)
@@ -1666,33 +1711,65 @@ def make_bait_dict():
     return(bait_dict)
 
 def find_position(key):
-    seq_name = key.split("_")[0]
-
+    seq_name = key.split(" ")[0]
+    #print(key)
     if seq_name in alignment_dict.keys():
         fasta_list = [alignment_dict[seq_name].upper()]
-    else : 
+    else :
         fasta_list=[]
         for keys in alignment_dict.keys():
               fasta_list.append(alignment_dict[keys].upper())
-   
+
     simulated_read = simulated_dict[key]
+    
+    i=0
     for fasta in fasta_list :
-        for pos in range(len(fasta)):
-            if hamming_dist(fasta[pos:(pos+len(simulated_read))], simulated_read) >= 0.70 :
-                return(pos+1, len(simulated_read))
-            if pos == len(fasta)-1:
-                return(-1, -1)        
+        for look in ["for", "rev"]:
+            for pos in range(len(fasta)):
+                fasta[pos:(pos+len(simulated_read))]
+                seq=re.sub("-", "", fasta[pos:(pos+len(simulated_read))])
+
+                gap_counter=0
+                while(len(seq) != len(simulated_read)):
+                    
+                    gap_counter= fasta[pos:(pos+(len(simulated_read)+gap_counter))].count("-")
+                    seq=re.sub("-", "", fasta[pos:(pos+(len(simulated_read)+gap_counter))])
+                    
+                    if pos+(len(simulated_read)+gap_counter) > len(fasta):
+                        return(-1,-1)
+                    
+                if len(seq) < len(simulated_read):
+                    continue
                 
+                if len(fasta_list)==1:
+                    if hamming_dist(seq, simulated_read) == 1 and look == "for":
+                        return(pos+1, len(simulated_read)) 
+                
+                    elif hamming_dist(seq, Seq(simulated_read).reverse_complement()) == 1  and look == "rev" :
+
+                        return(pos+1, len(simulated_read))                
+                elif len(fasta_list)!=1:    
+                    if hamming_dist(seq, simulated_read) >= 0.85 and look == "for":
+                        return(pos+1, len(simulated_read))
+                    elif hamming_dist(seq, Seq(simulated_read).reverse_complement()) >= 0.85 and look == "rev":
+                        return(pos+1, len(simulated_read))
+                if pos == len(fasta)-1:
+                    return(-1, -1)
+            i+=1
+
 def calculate_mismatches():
     i=0
+    dist_neg_count=0
     with open("validation_stats.tsv", "w") as file:
+        ham_dist_list_dict={}
         progress = tqdm(total=len(simulated_dict), desc="reads parsed ")
         file.write("read_name"+ "\t"+ \
                    "bait_match" + "\t" + \
                     "read_length" + "\t" + \
-                               "closest_dist" +\
-                                  "\t" + "max_overlap"+ "\t"+
-                                  "align_len" + "\n")
+                               "closest_dist" + "\t"+
+                                  "align_len" + "\t" +
+                                    "align_gc" + "\t" + 
+                                    "seq"+"\n")
         
         for key in simulated_dict.keys():
             dist_value="-1"
@@ -1700,32 +1777,41 @@ def calculate_mismatches():
             bait_list=[]
             bait_name="NA"
             pos, read_length=find_position(key)
+            #print("bait name = ", key, "start pos = " + str(pos))
+
             if pos == -1:
                 file.write(key.split(" ")[0]+"\t"+ \
                             "NA" + "\t" + \
-                                 str(read_length) + "\t" + \
+                                 str(pos) + "\t" + \
+                                         "NA" + "\t" + \
                                          "NA" + "\t" + \
                                          "NA" + "\t" + \
                                              "NA" +"\n")
 
                 continue
-                
+            #print("\n")    
             miss_min = 0
             for bait in bait_dict.keys():
                 the_read = simulated_dict[key]
                 tile_start = int([x for x in bait.split(" ") if ":" in x][0].split(":")[0])
-
                 bait_read_pos = len(the_read)-(tile_start-pos)
-                if (bait_read_pos<0) or (bait_read_pos>len(the_read)):
+                (tile_start-pos)
+                if (bait_read_pos<0) or ((bait_read_pos>len(the_read) + (args.baitlength-args.min_overlap))):
                     continue
                 if (bait_read_pos<args.min_overlap):
                     continue
-
+                #print("\ntile_start = " + str(tile_start))
+                #print("pos = " + str(pos))
+                #print("bait_read_pos = " + str(bait_read_pos))
+                #print("the_read = " + the_read)
                 tile_correction = (tile_start-pos)+1
+                #print("the_bait = " + bait_dict[bait][0:(len(the_read)-tile_correction)])
                 if tile_correction>0:
                     bait_seq=bait_dict[bait][0:(len(the_read)-tile_correction)] 
                     the_read=the_read[tile_correction:len(the_read)]
-
+                elif pos - tile_start == 1:
+                    bait_seq=bait_seq
+                    the_read=the_read
                 else :
                     if pos+read_length > tile_start+args.baitlength:
                         if tile_correction < 0:
@@ -1740,62 +1826,98 @@ def calculate_mismatches():
                     if len(bait_seq) < len(the_read):
                         the_read=the_read[0:len(bait_seq)]
                     elif len(bait_seq) > len(the_read):
-                        bait_seq=the_read[0:len(the_read)]          
+                        bait_seq=the_read[0:len(the_read)] 
+
+                #print("read cor = " + the_read)
+                #print("bait cor = " + bait_seq)
+
                 ham_dist_list.append(str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))))
                 bait_list.append(bait)
                 miss_min = max(hamming_dist(bait_seq, the_read), miss_min)
-
+                ham_dist_list_dict.update({str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))):[the_read, bait,bait_seq]})
+                
+            #print(ham_dist_list_dict[sorted(ham_dist_list,reverse=True)[0]])
             #print(sorted(ham_dist_list,reverse=True))
-            #if i == 2:
-
-            #    quit()
-            #i+=1    
-            #continue 
-            if len(ham_dist_list) != 0:  
+                
+            if len(ham_dist_list) != 0:
                 dist_value = sorted(ham_dist_list,reverse=True)[0]
-                for I in range(len(bait_list)) :
+                for I in range(len(bait_list)):
                     if ham_dist_list[I]==dist_value:
                         if "node" in bait_list[I]:
                             bait_name=bait_list[I]
                         elif bait_name == "NA":
                             bait_name=bait_list[I]
-            progress.update()                
+
+            if float(dist_value.split(":")[1])< 0.60 :
+                ali_lenght = int(sorted(ham_dist_list,reverse=True)[0].split(":")[0])
+                
+                for i in range(1, len(sorted(ham_dist_list,reverse=True))):
+                    if int(sorted(ham_dist_list,reverse=True)[i].split(":")[0]) != ali_lenght:
+                        #print(sorted(ham_dist_list,reverse=True)[i])
+                        ali_lenght = int(sorted(ham_dist_list,reverse=True)[i].split(":")[0])
+                    if float(sorted(ham_dist_list,reverse=True)[i].split(":")[1]) > 0.8 :
+                        dist_value=sorted(ham_dist_list,reverse=True)[i]
+                        #print(dist_value)
+                        break
+                
+            progress.update()                   
             if dist_value=="-1":
+                dist_neg_count+=1
                 continue
+            #print(the_read+"\n")
+            
+
             file.write(key.split(" ")[0]+"\t"+ \
                         re.sub(" ", "_", bait_name) + "\t" + \
                              str(read_length) + "\t" + \
-                                    str('%.3f'%(miss_min)) + "\t" + \
-                                         dist_value+ "\t" + \
-                                            str(dist_value.split(":")[0]) + "\n")            
+                                    str(dist_value.split(":")[1]) + "\t" + \
+                                            str(dist_value.split(":")[0]) + "\t" + \
+                                               str(sum(the_read.count(x) for x in ("C", "G"))/len(the_read)) + "\t" +\
+                                                   the_read + "\n")            
             i+=1
-            
+        #print("Number of reads outside capture range = " + str(dist_neg_count))    
         progress.close()
 
 def print_pandas():
     stats_pf = pd.read_csv("validation_stats.tsv",  delimiter= "\t")
-
+    gc_thresholds=args.GC_threshold.split("-")
     plot=1
     plt.rcParams['figure.figsize'] = [15,10]
     for i in range(50, 170, 10):
-        sub_bin = stats_pf.loc[(stats_pf['read_length']>=i) &(stats_pf['read_length']<i+10)]
 
+        sub_bin = stats_pf.loc[(stats_pf['read_length']>=i) &(stats_pf['read_length']<i+10)]
+        sub_bin_gc = sub_bin.loc[(sub_bin['align_gc']<float(min(gc_thresholds))) | (sub_bin['align_gc']>float(max(gc_thresholds)))]
+        sub_bin_gc_right = sub_bin.loc[(sub_bin['align_gc']>float(min(gc_thresholds))) & (sub_bin['align_gc']<float(max(gc_thresholds)))]
+        #print(len(sub_bin))
+        #print(len(sub_bin_gc_right))
         plt.subplot(3,4,plot)
         plt.plot(sub_bin['closest_dist'], 
-                 sub_bin['align_len'], 'ko', markersize=4, alpha=0.025)
+                 sub_bin['align_len'], 'ko', markersize=4, alpha=0.05)
+        plt.plot(sub_bin_gc['closest_dist'],
+                 sub_bin_gc['align_len'], "ro", markersize=2, alpha=0.25)
         plt.ylim(ymin = 0, ymax = 81)
         plt.xlim(xmin = 0.80, xmax = 1.005)
         plt.gca().spines.top.set_visible(False)
         plt.gca().spines.right.set_visible(False)
         plt.xticks(np.arange(0.80, 1.05, 0.05))
+        if len(sub_bin) == 0 :
+            continue
         plt.text(0.81, 81.5, "Read bin = "+str(i)+":"+str(i+10))
-        plt.text(0.81, 20.0, "N = "+str(len(sub_bin)))
-        plt.text(0.81, 15.0, "91% = "+str(round(sum(sub_bin['closest_dist']>=0.90)/len(sub_bin),2)))
-        plt.text(0.81, 10.0, "50nt, 91% = "+str(round(len(sub_bin.loc[(sub_bin['closest_dist']>=0.90) & (sub_bin['align_len']>=50)])/len(sub_bin), 2)))
+        plt.text(0.81, 20.0, "N = "+str(len(sub_bin))+\
+                                   " ("+str(len(sub_bin_gc_right))+")")
+        plt.text(0.81, 15.0, "91% = "+str(round(sum(sub_bin['closest_dist']>=0.90)/len(sub_bin),2))+" ("+\
+                                      str(round(sum(sub_bin_gc_right['closest_dist']>=0.90)/len(sub_bin_gc_right),2))+")")
+        plt.text(0.81, 10.0, "50nt, 91% = "+str(round(len(sub_bin.loc[(sub_bin['closest_dist']>=0.90) & (sub_bin['align_len']>=50)])/len(sub_bin), 2)) +\
+                                           " ("+str(round(len(sub_bin_gc_right.loc[(sub_bin_gc_right['closest_dist']>=0.90) & (sub_bin_gc_right['align_len']>=50)])/len(sub_bin_gc_right), 2))+")")
+        plt.text(0.81, 5.0, "GC "+str(int(float(min(gc_thresholds))*100))+"-"+ \
+                 str(int(float(max(gc_thresholds))*100))+"% = "+\
+                    str(round(len(sub_bin.loc[(sub_bin['align_gc']>float(min(gc_thresholds))) & 
+                                              (sub_bin['align_gc']<float(max(gc_thresholds)))])/len(sub_bin),2))+\
+                    "( "+ str(round(len(sub_bin_gc_right.loc[(sub_bin_gc_right['align_gc']>float(min(gc_thresholds))) & 
+                                              (sub_bin_gc_right['align_gc']<float(max(gc_thresholds)))])/len(sub_bin_gc_right),2))+")")
 
         plot+=1
     plt.savefig("validation_plot.svg")
-
 if __name__ == '__main__':
     if (args.run_validation_only != True):
         print("Run Gotcha Main")

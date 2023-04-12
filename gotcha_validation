@@ -213,7 +213,7 @@ def calculate_mismatches():
                             bait_name=bait_list[I]
                         elif bait_name == "NA":
                             bait_name=bait_list[I]
-            progress.update()                
+                            
             if dist_value=="-1":
                 continue
             file.write(key.split(" ")[0]+"\t"+ \
