@@ -1530,7 +1530,7 @@ def fast_mode():
                 else:
                     flag="GC="+str(gc)+"; "+"GC_flag=good;"
 
-                baits.append(SeqRecord(Seq(str(bait)), id=record.id+"_"+str(t)+str(t+baitsize), description=flag))
+                baits.append(SeqRecord(Seq(str(bait)), id=record.id+" "+str(t)+":"+str(t+baitsize), description=flag))
 
         SeqIO.write(baits, "tmp_f.fasta", "fasta")
 
@@ -1598,18 +1598,24 @@ def clean_up():
     shutil.copy(args.out + "_raw_baits.fasta", '..')
     shutil.copy(args.out + "_filtered_baits.fasta", '..')
     shutil.copy(args.out + "_filtered_uniq_baits.fasta", '..')
-
-
+    shutil.copy(args.out + "_filtered_uniq_clustered_baits.fasta", '..')
+    os.rename("tmp1.fna", "original.fasta")
+    shutil.copy("original.fasta", '..')
+    
+    def_aln_file = args.out + ".aln"
     if args.fast != True :
         shutil.copy('summary_stats.pdf', '..')
         #shutil.copy(def_tre_file, '..')
         shutil.copy("node_tree_branch_lenght.nwk", '..')
         os.rename("node_tree_branch_lenght.nwk", args.out + "_node_tree_branch_lenght.nwk")
         shutil.copy(def_aln_file, '..')
-        os.rename("tmp1.fna", "original.fasta")
-        shutil.copy("original.fasta", '..')
         shutil.copy("node_tree.svg", '..')
 
+    if args.fast == True :    
+        def_aln_file = args.out + ".aln"
+        os.rename("size_selected.fasta", def_aln_file)
+        shutil.copy(def_aln_file, '..')
+        
     os.chdir('..')
 
     if args.verbose == False :
@@ -1697,7 +1703,7 @@ def make_simulated_dict_costume():
 
 def make_bait_dict():
     bait_dict={}
-    baits = open(args.out + "_filtered_uniq_baits.fasta")
+    baits = open(args.out + "_filtered_uniq_clustered_baits.fasta")
     #baits = open(args.out + "_raw_baits.fasta")
     for row in baits :
         if ">" in row:
@@ -1777,7 +1783,6 @@ def calculate_mismatches():
             bait_list=[]
             bait_name="NA"
             pos, read_length=find_position(key)
-            #print("bait name = ", key, "start pos = " + str(pos))
 
             if pos == -1:
                 file.write(key.split(" ")[0]+"\t"+ \
@@ -1787,9 +1792,10 @@ def calculate_mismatches():
                                          "NA" + "\t" + \
                                          "NA" + "\t" + \
                                              "NA" +"\n")
-
+                progress.update()  
                 continue
-            #print("\n")    
+
+
             miss_min = 0
             for bait in bait_dict.keys():
                 the_read = simulated_dict[key]
@@ -1800,12 +1806,7 @@ def calculate_mismatches():
                     continue
                 if (bait_read_pos<args.min_overlap):
                     continue
-                #print("\ntile_start = " + str(tile_start))
-                #print("pos = " + str(pos))
-                #print("bait_read_pos = " + str(bait_read_pos))
-                #print("the_read = " + the_read)
                 tile_correction = (tile_start-pos)+1
-                #print("the_bait = " + bait_dict[bait][0:(len(the_read)-tile_correction)])
                 if tile_correction>0:
                     bait_seq=bait_dict[bait][0:(len(the_read)-tile_correction)] 
                     the_read=the_read[tile_correction:len(the_read)]
@@ -1828,16 +1829,10 @@ def calculate_mismatches():
                     elif len(bait_seq) > len(the_read):
                         bait_seq=the_read[0:len(the_read)] 
 
-                #print("read cor = " + the_read)
-                #print("bait cor = " + bait_seq)
-
                 ham_dist_list.append(str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))))
                 bait_list.append(bait)
                 miss_min = max(hamming_dist(bait_seq, the_read), miss_min)
                 ham_dist_list_dict.update({str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))):[the_read, bait,bait_seq]})
-                
-            #print(ham_dist_list_dict[sorted(ham_dist_list,reverse=True)[0]])
-            #print(sorted(ham_dist_list,reverse=True))
                 
             if len(ham_dist_list) != 0:
                 dist_value = sorted(ham_dist_list,reverse=True)[0]
@@ -1847,26 +1842,25 @@ def calculate_mismatches():
                             bait_name=bait_list[I]
                         elif bait_name == "NA":
                             bait_name=bait_list[I]
+            if dist_value == "-1" :
+                progress.update()  
+                continue
 
             if float(dist_value.split(":")[1])< 0.60 :
                 ali_lenght = int(sorted(ham_dist_list,reverse=True)[0].split(":")[0])
-                
+
                 for i in range(1, len(sorted(ham_dist_list,reverse=True))):
                     if int(sorted(ham_dist_list,reverse=True)[i].split(":")[0]) != ali_lenght:
-                        #print(sorted(ham_dist_list,reverse=True)[i])
                         ali_lenght = int(sorted(ham_dist_list,reverse=True)[i].split(":")[0])
                     if float(sorted(ham_dist_list,reverse=True)[i].split(":")[1]) > 0.8 :
                         dist_value=sorted(ham_dist_list,reverse=True)[i]
-                        #print(dist_value)
                         break
                 
             progress.update()                   
             if dist_value=="-1":
                 dist_neg_count+=1
                 continue
-            #print(the_read+"\n")
             
-
             file.write(key.split(" ")[0]+"\t"+ \
                         re.sub(" ", "_", bait_name) + "\t" + \
                              str(read_length) + "\t" + \
@@ -1874,8 +1868,7 @@ def calculate_mismatches():
                                             str(dist_value.split(":")[0]) + "\t" + \
                                                str(sum(the_read.count(x) for x in ("C", "G"))/len(the_read)) + "\t" +\
                                                    the_read + "\n")            
-            i+=1
-        #print("Number of reads outside capture range = " + str(dist_neg_count))    
+            i+=1    
         progress.close()
 
 def print_pandas():
@@ -2004,11 +1997,11 @@ if __name__ == '__main__':
             summary_info_r_script()
         clean_up()
         #####################################################################
-
+    
     if (args.run_validation == True) or (args.run_validation_only == True):
+        def_aln_file = args.out + ".aln"
         if(args.run_validation_only == True):
             os.chdir(args.out)
-            def_aln_file = args.out + ".aln"
         print("Run Gotcha Validator")
         fasta_dict = make_fasta_dict()
         simulated_dict = make_simulated_dict_costume()
