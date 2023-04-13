@@ -1650,7 +1650,7 @@ def make_fasta_dict():
             header=re.sub("\n|>", "", row)
             seq=str()
         elif ">" in row :
-            fasta_dict.update({header:seq})
+            fasta_dict.update({header:seq.upper()})
             seq=str()
             header=re.sub("\n|>", "", row)
         else:
@@ -1668,7 +1668,7 @@ def make_aln_dict():
             header=re.sub("\n|>", "", row)
             seq=str()
         elif ">" in row :
-            alignment_dict.update({header:seq})
+            alignment_dict.update({header:seq.upper()})
             seq=str()
             header=re.sub("\n|>", "", row)
         else:
@@ -1692,7 +1692,7 @@ def make_simulated_dict_costume():
         if pos+read_length >= len(fasta_dict[ran_seq]) :
             continue
         
-        simulated_dict.update({ran_seq+" sim_read_"+str(count)+"_start="+str(pos):fasta_dict[ran_seq][pos:(pos)+read_length]})
+        simulated_dict.update({ran_seq+" sim_read_"+str(count)+"_start="+str(pos):fasta_dict[ran_seq][pos:(pos)+read_length].upper()})
         count+=1
         progress.update()
     progress.close()
