@@ -1094,7 +1094,7 @@ def bait_finder():
                 node_name ="node #"+str(node.name)
                 level="NODE"
             else:
-                node_name =re.sub("^\d*_", "", str(node.name))
+                node_name =re.sub(r"^\d*_", "", str(node.name))
                 node_name_tip =str(node.name)
                 level="TIP"
 
@@ -1104,7 +1104,7 @@ def bait_finder():
             gap_counter_all=[]
             for seq in list(clade):
                 gap_counter=0
-                tip_seq, gap_counter = find_ungaped_seq(pos, re.sub("^\d*_", "", seq))
+                tip_seq, gap_counter = find_ungaped_seq(pos, re.sub(r"^\d*_", "", seq))
             
                 gap_counter_all.append(gap_counter)
             
@@ -1118,7 +1118,7 @@ def bait_finder():
                 gaps=[]
                 
                 for seq in list(clade):
-                    gaps.append(fasta_dict[re.sub("^\d*_", "", seq)][nt])
+                    gaps.append(fasta_dict[re.sub(r"^\d*_", "", seq)][nt])
                 if gaps.count("-") == 0:
                     ungap_pos.append(nt)
                     if len(ungap_pos) != args.baitlength:
@@ -1129,7 +1129,7 @@ def bait_finder():
             anc_str = get_seq(node_seq_dict, node_name)
 
             for seq in list(clade):
-                tip_seq=get_seq(fasta_dict, re.sub("^\d*_", "", seq))
+                tip_seq=get_seq(fasta_dict, re.sub(r"^\d*_", "", seq))
                 miss=0
                 for nt in range(len(tip_seq)):
                     if tip_seq[nt].upper()!= anc_str[nt].upper() and tip_seq[nt] != "-" :
