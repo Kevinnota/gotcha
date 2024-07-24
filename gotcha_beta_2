@@ -46,7 +46,6 @@ from collections import Counter #new v2.2.2
 from numpy import random # new v3
 import matplotlib.pyplot as plt # new v3
 import numpy as np
-import csv #new v5
 ##################################################################################################### parsing arguments and setting variables
 
 class Range(object):
@@ -71,51 +70,52 @@ parser.formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog, max_he
 formatter_class=argparse.RawTextHelpFormatter
 
 man = parser.add_argument_group('MARKER')
-man.add_argument('-m', '--marker', metavar=r'\b', choices=['COI-5P', 'COI-3P', 'rbcL', 'matK', 'ITS', 'coding' , 'noncoding'], help='can be COI/rbcL/matK/ITS or coding/noncoding using custom .fna/.aln')
-man.add_argument('-c', '--code', metavar=r'\b', help='genetic code - e.g. 1 for plastid and nuclear, 5 for mitochondrial invertebrate')
+man.add_argument('-m', '--marker', metavar='\b', choices=['COI-5P', 'COI-3P', 'rbcL', 'matK', 'ITS', 'coding' , 'noncoding'], help='can be COI/rbcL/matK/ITS or coding/noncoding using custom .fna/.aln')
+man.add_argument('-c', '--code', metavar='\b', help='genetic code - e.g. 1 for plastid and nuclear, 5 for mitochondrial invertebrate')
 
 bld = parser.add_argument_group('BOLD DOWNLOAD')
-bld.add_argument('-t', '--taxa', metavar=r'\b', help='input taxa')
-bld.add_argument('-g', '--geo', metavar=r'\b', default="", help='geographic location of samples')
-bld.add_argument('-ft', '--filter_tax', metavar=r'\b', default="", choices=['species', 'genus', 'family'], help='can be species/genus/family - defeault is none')
-bld.add_argument("-bp", "--boldcli_path", metavar=r'\b', default="bold-cli", help="path to bold-cli")
+bld.add_argument('-t', '--taxa', metavar='\b', help='input taxa')
+bld.add_argument('-g', '--geo', metavar='\b', default="", help='geographic location of samples')
+bld.add_argument('-ft', '--filter_tax', metavar='\b', default="", choices=['species', 'genus', 'family'], help='can be species/genus/family - defeault is none')
+bld.add_argument("-bp", "--boldcli_path", metavar='\b', default="bold-cli", help="path to bold-cli")
 
 ctm = parser.add_argument_group('CUSTOM INPUTS')
-ctm.add_argument('-cf', '--custom_fna', metavar=r'\b', default="", help='custom nucleotide sequences file (.fasta format)')
-ctm.add_argument('-ca', '--custom_aln', metavar=r'\b', default="", help='custom nucleotide alignment file (.fasta format) - gotcha will jump to size selection')
-ctm.add_argument('-cn', '--custom_nwk', metavar=r'\b', default="", help='custom newick file - tree can be multifurcating and can lack taxa')
+ctm.add_argument('-cf', '--custom_fna', metavar='\b', default="", help='custom nucleotide sequences file (.fasta format)')
+ctm.add_argument('-ca', '--custom_aln', metavar='\b', default="", help='custom nucleotide alignment file (.fasta format) - gotcha will jump to size selection')
+ctm.add_argument('-cn', '--custom_nwk', metavar='\b', default="", help='custom newick file - tree can be multifurcating and can lack taxa')
 
 par = parser.add_argument_group('BAITS SEARCH PARAMETERS')
-par.add_argument('-fl', '--filter_len', metavar=r'\b', default=100, help='minimum amminoacids / nucleotides length - default is 100', type=check_positive)
-par.add_argument('-sc', '--seq_collapse', metavar=r'\b', type=float, default=1, help='percent identity to collapse sequences - default is 1')
-par.add_argument('-bc', '--bts_collapse', metavar=r'\b', type=float, default=1, help='percent identity to collapse baits - defeault is 1')
-par.add_argument('-bl', "--baitlength", metavar=r'\b', type=int, default=80, help='lenght of the bait sequences - default is 80')
-par.add_argument('-tl', "--tiling", metavar=r'\b', default=30, type=int, help='kmer tiling for ancestral node selection - default is 30') #changed the default from 10 to 30 (think most cases ~3x coverage is alright and for a 80mer, that would be ~30)
-par.add_argument('-ds', "--distance", metavar=r'\b', type=float, default=0.09, help='maximal distance to the ancestral node - default is 0.09')
-par.add_argument('-so', "--trim_seqoverlap", metavar=r'\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
-par.add_argument('-ro', "--trim_resoverlap", metavar=r'\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
-par.add_argument('-dt', "--dust_threshold", metavar=r'\b', default=10, help='score threshold for low complexity region masking - default is 10')
-par.add_argument('-mf', "--max_farg_lenght", metavar=r'\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
+par.add_argument('-fl', '--filter_len', metavar='\b', default=100, help='minimum amminoacids / nucleotides length - default is 100', type=check_positive)
+par.add_argument('-sc', '--seq_collapse', metavar='\b', type=float, default=1, help='percent identity to collapse sequences - default is 1')
+par.add_argument('-bc', '--bts_collapse', metavar='\b', type=float, default=1, help='percent identity to collapse baits - defeault is 1')
+par.add_argument('-bl', "--baitlength", metavar='\b', type=int, default=80, help='lenght of the bait sequences - default is 80')
+par.add_argument('-tl', "--tiling", metavar='\b', default=30, type=int, help='kmer tiling for ancestral node selection - default is 30') #changed the default from 10 to 30 (think most cases ~3x coverage is alright and for a 80mer, that would be ~30)
+par.add_argument('-ds', "--distance", metavar='\b', type=float, default=0.09, help='maximal distance to the ancestral node - default is 0.09')
+par.add_argument('-so', "--trim_seqoverlap", metavar='\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
+par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
+par.add_argument('-dt', "--dust_threshold", metavar='\b', default=10, help='score threshold for low complexity region masking - default is 10')
+par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
                                                                                                                                                                                 \ndefault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
-par.add_argument('-GC', "--GC_threshold", metavar=r'\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
-par.add_argument('-ks', "--keep_short_sequences", help='keep short sequences in size selection step', action='store_true')
+par.add_argument('-GC', "--GC_threshold", metavar='\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
+par.add_argument('-ks', "--keep_short_sequences",  help='keep short sequences in size selection step', action='store_true')
+par.add_argument('-NS', "--no_size_selection",  help='preforms size selection', action='store_false', default=True)
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
 par.add_argument('-mc', '--manual_check', action='store_true', help='stops prior to tree inference for a manual check of the alignment')
 
 fal = parser.add_argument_group('VALIDATION')
 fal.add_argument('-VR', "--run_validation", help='Run bait validation with simulated data', action='store_true')
 fal.add_argument('-VO', "--run_validation_only",  help='Run only the bait validation with simulated data', action='store_true')
-fal.add_argument('-ns', "--n_simulated",metavar=r'\b',  default=10000, type=int, help='number of reads to simulate')
-fal.add_argument('-dp', "--distribution_par",metavar=r'\b',  default="50:50:35",  help='distribution for reads simulation min_read_length:mean:sd of normal distribution')
-fal.add_argument('-mo', "--min_overlap", metavar=r'\b', default=20, type=int, help='min overlap read to bait to be considered in calculation')
+fal.add_argument('-ns', "--n_simulated",metavar='\b',  default=10000, type=int, help='number of reads to simulate')
+fal.add_argument('-dp', "--distribution_par",metavar='\b',  default="50:50:35",  help='distribution for reads simulation min_read_length:mean:sd of normal distribution')
+fal.add_argument('-mo', "--min_overlap", metavar='\b', default=20, type=int, help='min overlap read to bait to be considered in calculation')
 
 otr = parser.add_argument_group('OTHER')
 otr.add_argument("-h", "--help", action="help", help="show this help message and exit")
 otr.add_argument("-path", default=".", help=argparse.SUPPRESS)
-otr.add_argument('-o', '--out', metavar=r'\b', default="probes", help='basename of output file and folders - default is probes')
+otr.add_argument('-o', '--out', metavar='\b', default="probes", help='basename of output file and folders - default is probes')
 otr.add_argument('-v', '--verbose', action='store_false', help='keeps temporary folder and files')
 otr.add_argument('-e', '--erase', action='store_true', help='erases and rewrites a pre existing output folder')
-otr.add_argument('-th', '--threads', metavar=r'\b', type=check_positive, default=1, help='number of threads used for tree inference - default is 1')
+otr.add_argument('-th', '--threads', metavar='\b', type=check_positive, default=1, help='number of threads used for tree inference - default is 1')
 otr.add_argument('--version', action='store_true', help="show program's version number")
 
 args=parser.parse_args()
@@ -534,8 +534,8 @@ def seq_quality_filters():
         # remove "N" and "-"
         with open("tmp4.fna", "w") as tmp4_fna:
             for record in SeqIO.parse("tmp3.fna", "fasta"):
-                record.seq = Seq(str(record.seq).replace("-", ""))
-                record.seq = Seq(str(record.seq).replace("n", ""))
+                record.seq = record.seq.replace("-", "")
+                record.seq = record.seq.replace("n", "")
                 SeqIO.write(record, tmp4_fna, "fasta")
 
         # protein-guided nucleotide alignment with translatorx
@@ -609,12 +609,9 @@ def seq_quality_filters():
 def size_selection():
 
     input_sequences=list(SeqIO.parse("tmp.aln", "fasta")) # path to the fasta file
-    #fragment_selections= pd.DataFrame()
+    fragment_selections= pd.DataFrame()
     #counting the number of gaps in the alignment file
-    #gaps = pd.DataFrame()
-
-    fragment_selections= {}
-    gaps = {}
+    gaps = pd.DataFrame()
 
     threshold_list=[]
     number_of_sequences_list=[]
@@ -637,19 +634,15 @@ def size_selection():
             if (input_sequences[i].seq[p] == "-"):
                 gap_positions += 1
             #data = pd.Series({'position':p, 'proportion gaps':gap_positions/len(input_sequences)})
-        
-        gaps[p] = gap_positions/len(input_sequences)
-        #position_list.append(p)
-        #proportion_gaps.append(gap_positions/len(input_sequences))
+
+        position_list.append(p)
+        proportion_gaps.append(gap_positions/len(input_sequences))
         #gaps=gaps.append(pd.DataFrame(data), ignore_index=True)
 
         #gaps= pd.concat([gaps, data.to_frame().T], ignore_index=True)
         #progress.update()
     #progress.close()
-    #print(position_list)
-    #print(proportion_gaps)
-    #gaps=pd.DataFrame({'position':position_list, 'proportion gaps':proportion_gaps})
-    #gaps={'position':position_list, 'proportion gaps':proportion_gaps}
+    gaps=pd.DataFrame({'position':position_list, 'proportion gaps':proportion_gaps})
     #progress=tqdm(total=None, desc="Calculating distance = ")
     for treshold in range(0, 100):
         threshold_found=False
@@ -659,11 +652,10 @@ def size_selection():
         # tressholds that are tested are 0-1 with 0.01 increments (101 loops)
         
         while not (threshold_found==True) :
-            if (gaps[i]<=float(treshold/100)):
+            if (gaps.loc[i,"proportion gaps"]<=float(treshold/100)):
                 threshold_found=True
-                start_position=i
+                start_position=int(gaps.loc[i,"position"])
             i=i+1
-
             if(i==len(gaps)):
                 threshold_found=True
                 start_position=0
@@ -671,9 +663,9 @@ def size_selection():
         threshold_found=False
         i=len(gaps)-1
         while not (threshold_found==True) :
-            if (gaps[i]<=float(treshold/100)):
+            if (gaps.loc[i,"proportion gaps"]<=float(treshold/100)):
                 threshold_found=True
-                finish_position=i
+                finish_position=int(gaps.loc[i,"position"])
             i=i-1
             if(i==0):
                 threshold_found=True
@@ -707,45 +699,30 @@ def size_selection():
         #fragment_selections = fragment_selections.append(pd.DataFrame(data), ignore_index=True)
         #fragment_selections = pd.concat([fragment_selections, data.to_frame().T], ignore_index=True)
         #progress.update()
-    fragment_selections = {'threshold':threshold_list, 
+    fragment_selections = pd.DataFrame({'threshold':threshold_list, 
                                         'number of sequences':number_of_sequences_list,
                                         'seq_length':seq_length_list,
                                         'number * lenght':number_X_length_list,
                                         'start position':start_position_list,
-                                        'finish_position':end_position_list}
+                                        'finish_position':end_position_list})
 
-    transposed_data = [
-        {key: fragment_selections[key][i] for key in fragment_selections}
-        for i in range(len(threshold_list))
-    ]
-    
-    tsv_file = open("size_selection_summary.tsv", 'w')
-    writer = csv.DictWriter(tsv_file, fieldnames=fragment_selections.keys(), delimiter='\t')
-    writer.writeheader()
-    writer.writerows(transposed_data)
-
-    #fragment_selections.to_csv("size_selection_summary.df", sep="\t") # new version 2.3.2
+    fragment_selections.to_csv("size_selection_summary.df", sep="\t") # new version 2.3.2
     #progress.close()    
 
     # loop to find the most optimal fragment lenght
     find_optimal_fragment=False
-    #fragment_selections = fragment_selections.loc[fragment_selections['seq_length'] <= args.max_farg_lenght] # new version 2.3.2 (gaps is a problem here)
-    
     i=0
+
+    fragment_selections = fragment_selections.loc[fragment_selections['seq_length'] <= args.max_farg_lenght] # new version 2.3.2 (gaps is a problem here)
+    
     while not (find_optimal_fragment==True):
-        if fragment_selections['seq_length'][i] >= args.max_farg_lenght:
-            continue
-        if((fragment_selections["number * lenght"][i]==max(fragment_selections['number * lenght']))==True):
+        if((fragment_selections.loc[i,"number * lenght"]==fragment_selections['number * lenght'].max())==True):
             #optimal_threshold=fragment_selections.loc[i, 'threshold']
             find_optimal_fragment=True
-            start_position=fragment_selections['start position'][i]
-            #start_position=fragment_selections.loc[i,'start position']
-            finish_position=fragment_selections['finish_position'][i]
-            #finish_position=fragment_selections.loc[i,'finish_position']
-            selected_size=fragment_selections['seq_length'][i]
-            #selected_size=fragment_selections.loc[i,'seq_length']
-        #seq_count=fragment_selections.loc[i, 'number of sequences']
-        seq_count=fragment_selections['number of sequences'][i]
+            start_position=fragment_selections.loc[i,'start position']
+            finish_position=fragment_selections.loc[i,'finish_position']
+            selected_size=fragment_selections.loc[i,'seq_length']
+        seq_count=fragment_selections.loc[i, 'number of sequences']
         i=i+1
 
     print(selected_size)
@@ -1118,7 +1095,7 @@ def bait_finder():
                 node_name ="node #"+str(node.name)
                 level="NODE"
             else:
-                node_name =re.sub(r"^\d*_", "", str(node.name))
+                node_name =re.sub("^\d*_", "", str(node.name))
                 node_name_tip =str(node.name)
                 level="TIP"
 
@@ -1128,7 +1105,7 @@ def bait_finder():
             gap_counter_all=[]
             for seq in list(clade):
                 gap_counter=0
-                tip_seq, gap_counter = find_ungaped_seq(pos, re.sub(r"^\d*_", "", seq))
+                tip_seq, gap_counter = find_ungaped_seq(pos, re.sub("^\d*_", "", seq))
             
                 gap_counter_all.append(gap_counter)
             
@@ -1142,7 +1119,7 @@ def bait_finder():
                 gaps=[]
                 
                 for seq in list(clade):
-                    gaps.append(fasta_dict[re.sub(r"^\d*_", "", seq)][nt])
+                    gaps.append(fasta_dict[re.sub("^\d*_", "", seq)][nt])
                 if gaps.count("-") == 0:
                     ungap_pos.append(nt)
                     if len(ungap_pos) != args.baitlength:
@@ -1153,7 +1130,7 @@ def bait_finder():
             anc_str = get_seq(node_seq_dict, node_name)
 
             for seq in list(clade):
-                tip_seq=get_seq(fasta_dict, re.sub(r"^\d*_", "", seq))
+                tip_seq=get_seq(fasta_dict, re.sub("^\d*_", "", seq))
                 miss=0
                 for nt in range(len(tip_seq)):
                     if tip_seq[nt].upper()!= anc_str[nt].upper() and tip_seq[nt] != "-" :
@@ -1204,7 +1181,9 @@ def bait_finder():
                     gap_cor_tip = re.sub("-", "", fasta_dict[tip][pos:(pos+args.baitlength+gap_counter)])
                     #print(gap_cor_tip)
                     #print(len (gap_cor_tip))
-                    if pos+args.baitlength+gap_counter > seq_len:
+                    #print("\n"+str(seq_len))
+                    #print(pos+args.baitlength+gap_counter)
+                    if pos+args.baitlength+gap_counter >= seq_len:
                         end_of_seq=True
                         break
                     #print("\ntip seq : " + gap_cor_tip)
@@ -1219,10 +1198,11 @@ def bait_finder():
             for nt in range(pos, (pos+args.baitlength+gap_counter)):
                 if fasta_dict[tip][nt] != "-" :
                     ungap_pos.append(nt)
-
-
-            if len(ungap_pos) != args.baitlength:# hack not sure why some areas behave like this, looks like it has somehting to do with ending on a gap
+            
+            #print(ungap_pos)
+            if len(ungap_pos) != args.baitlength:# hack; not sure why some areas behave like this, looks like it has somehting to do with ending on a gap
                 ungap_pos.append(pos+args.baitlength+gap_counter+1)
+
             #print(len(ungap_pos))
             #print("\n")
             #print(ungap_pos)
@@ -1231,10 +1211,9 @@ def bait_finder():
 
             tip_no_node.append(gap_cor_tip.upper())
             tip_no_node_name.append(str(tip))
-            
             gap_cor_tip_dict.update({tip:ungap_pos})
-
             # here the tips sequences without node need to become ungapped based on the starting position.
+        #print(gap_cor_tip_dict)
         progress_int_2=[]
         if len(tip_no_node_name) > 200 :
             progress_int_2=tqdm(total=len(tip_no_node_name)+1, desc=str("Finding nearest ancestral node ; pos = " + str(pos)))
@@ -1291,9 +1270,12 @@ def bait_finder():
                         continue
 
                     if len(seq)!=args.baitlength:
+                        if ungap_pos[args.baitlength-1] >= seq_len:
+                            continue                        
                         anc_str=get_seq(node_seq_dict, key)
                         
                         gc=((anc_str.upper().count("G")+anc_str.upper().count("C"))/args.baitlength)
+                        print(gc)
                         if gc>=float(min(gc_thresholds)) and gc<=float(max(gc_thresholds)): 
                             for nt in range(len(seq)):
                                 if seq[nt].upper()!=anc_str[nt].upper() and seq[nt] != "-":
@@ -1317,6 +1299,8 @@ def bait_finder():
                 if(len(miss_dic)!=0):
                     if min(miss_dic.values())>max_n_miss:
                         ungap_pos = gap_cor_tip_dict[tip_name]
+                        if ungap_pos[args.baitlength-1] >= seq_len:
+                            continue
                         #print(ungap_pos)
                         #print(len(ungap_pos))
                         #print(get_seq(fasta_dict, tip_name).upper())
@@ -1325,6 +1309,8 @@ def bait_finder():
                         c_baits=c_baits+1
                     else:  
                         ungap_pos = gap_cor_tip_dict[tip_name]
+                        if ungap_pos[args.baitlength-1] >= seq_len:
+                            continue                        
                         needed_key = [key for key in miss_dic.keys() if miss_dic[key] == min(miss_dic.values())]
                         bait_fasta.append(">"+str(sorted(needed_key)[0])+ " "+ str(ungap_pos[0])+":"+str(ungap_pos[args.baitlength-1]) + "\n" +get_seq(node_seq_dict, sorted(needed_key)[0])+"\n")
                         baitmer_list.append(anc_str)
@@ -1540,7 +1526,7 @@ def fast_mode():
     run="TRUE"
     if(run=="TRUE"):
         for record in (SeqIO.parse("tmp.aln", "fasta")):
-            seq=Seq(str(record.seq.replace("-", "")))
+            seq=record.seq.replace("-", "")
             for t in range(0, len(seq), int(args.tiling)):
                 if(len(seq[t:(t+baitsize)])!=baitsize):
                     break
@@ -1661,12 +1647,15 @@ def clean_up():
 def hamming_dist(bait, read): 
     distance = 0
     for i in range(len(bait)):
+        if len(read) < len(bait):
+            break
         if bait[i].upper() != read[i].upper():
             distance += 1
     return(1-(distance/len(read)))
 
 def make_fasta_dict():
     fasta = open("original.fasta")
+    #fasta = open(def_aln_file)
     i=0
     fasta_dict={}
     for row in fasta:
@@ -1703,7 +1692,8 @@ def make_aln_dict():
 
 def make_simulated_dict_costume():
     progress = tqdm(total=args.n_simulated, desc="reads simulated ")
-    simulated_dict={}
+    #simulated_dict={}
+    simulated_dict = manager.dict(simulated_dict)
     count=1
 
     while len(simulated_dict) != args.n_simulated :
@@ -1721,13 +1711,15 @@ def make_simulated_dict_costume():
         progress.update()
     progress.close()
 
-
+    manager = multiprocessing.Manager()
+    simulated_dict = manager.dict()
 
     return(simulated_dict)       
 
-def make_bait_dict():
+def make_bait_dict(): # old script
     bait_dict={}
     baits = open(args.out + "_filtered_uniq_clustered_baits.fasta")
+    #baits = open(args.out + "_filtered_uniq_clustered_95_baits.fasta")
     #baits = open(args.out + "_raw_baits.fasta")
     for row in baits :
         if ">" in row:
@@ -1740,9 +1732,8 @@ def make_bait_dict():
             bait_dict.update({header:seq})
     return(bait_dict)
 
-def find_position(key):
+def find_position(key): # old script
     seq_name = key.split(" ")[0]
-    #print(key)
     if seq_name in alignment_dict.keys():
         fasta_list = [alignment_dict[seq_name].upper()]
     else :
@@ -1751,12 +1742,12 @@ def find_position(key):
               fasta_list.append(alignment_dict[keys].upper())
 
     simulated_read = simulated_dict[key]
-    
+    print(simulated_read)
     i=0
     for fasta in fasta_list :
         for look in ["for", "rev"]:
             for pos in range(len(fasta)):
-                fasta[pos:(pos+len(simulated_read))]
+                
                 seq=re.sub("-", "", fasta[pos:(pos+len(simulated_read))])
 
                 gap_counter=0
@@ -1767,12 +1758,20 @@ def find_position(key):
                     
                     if pos+(len(simulated_read)+gap_counter) > len(fasta):
                         return(-1,-1)
-                    
+                #print(gap_counter)
+                #print(seq)
                 if len(seq) < len(simulated_read):
                     continue
-                
+
+                print(fasta_list)
                 if len(fasta_list)==1:
+                    #print(seq)
+                    #print(simulated_read)
                     if hamming_dist(seq, simulated_read) == 1 and look == "for":
+                        print(seq)
+                        print(simulated_read)
+                        print(pos+1)
+                        print(len(simulated_read))
                         return(pos+1, len(simulated_read)) 
                 
                     elif hamming_dist(seq, Seq(simulated_read).reverse_complement()) == 1  and look == "rev" :
@@ -1787,7 +1786,112 @@ def find_position(key):
                     return(-1, -1)
             i+=1
 
-def calculate_mismatches():
+def find_pos_2(): # New much better, made with chatGPD
+    progress = tqdm(total=len(simulated_dict), desc="reads parsed ")
+    summary_dict={"read_name":[],
+                  "bait_name":[],
+                  "read_length":[],
+                  "closest_dist":[],
+                  "align_len":[],
+                  "align_gc":[],
+                  "seq":[]}
+    
+    for key in simulated_dict.keys():
+        ham_dist_list=[]
+        the_read = simulated_dict[key]
+        #print(the_read)
+        #print(the_read)
+        max_hamming_distance = int(len(the_read)*0.2)
+        #print(max_hamming_distance)
+        for bait in bait_dict.keys():
+            bait_seq = bait_dict[bait]
+        for i in range(len(the_read)):
+            for j in range(i+1, min(i+81, len(the_read)+1)):
+                substring = the_read[i:j]
+                if len(substring)<=args.min_overlap:
+                    continue
+                #print(substring)
+                for k in range(len(bait_seq)):
+                    bait_seq_subseq=bait_seq[k:len(substring)]
+                # check if the substring matches the compare sequence within the maximum Hamming distance
+                    if sum([a != b for a, b in zip(substring, bait_seq_subseq)]) <= max_hamming_distance:
+                        ham_dist_list.append((len(substring),
+                                              1-(sum([a != b for a, b in zip(substring, bait_seq_subseq)])/len(substring)), 
+                                              bait,
+                                              substring))
+                        
+        ham_dist_list.sort(key=lambda x: (-x[0], -x[1]))
+        summary_dict["read_name"].append(key)
+        summary_dict["bait_name"].append(ham_dist_list[0][2])
+        summary_dict["read_length"].append(len(the_read))
+        summary_dict["closest_dist"].append(ham_dist_list[0][1])
+        summary_dict["align_len"].append(ham_dist_list[0][0])
+        gc = (ham_dist_list[0][3].upper().count("G") + ham_dist_list[0][3].upper().count("C"))/len(ham_dist_list[0][3])
+        summary_dict["align_gc"].append(gc)
+        summary_dict["seq"].append(ham_dist_list[0][3].upper())
+        progress.update()
+    return(summary_dict)
+
+import multiprocessing
+from tqdm import tqdm
+
+def process_key(key, simulated_dict, summary_dict, bait_dict, args):
+    ham_dist_list=[]
+    the_read = simulated_dict[key]
+    weight=0.5
+    for bait in bait_dict.keys():
+        bait_seq = bait_dict[bait]
+        for i in range(len(the_read)):
+            for j in range(i+1, min(i+81, len(the_read)+1)):
+                substring = the_read[i:j].upper()
+                max_hamming_distance = int(len(substring)*0.2)
+                if len(substring)<=args.min_overlap:
+                    continue
+                for k in range(len(bait_seq)):
+                    bait_seq_subseq=bait_seq[k:len(substring)].upper()
+                    if len(bait_seq_subseq) <= args.min_overlap:
+                        continue
+                    hamming_count=sum([a != b for a, b in zip(substring, bait_seq_subseq)])
+                    if hamming_count <= max_hamming_distance:
+                        value = 1-(hamming_count/len(substring)) * weight + len(bait_seq_subseq) * (1 - weight)
+                        ham_dist_list.append((len(bait_seq_subseq),
+                                            1-(sum([a != b for a, b in zip(substring, bait_seq_subseq)])/len(substring)), 
+                                            value, #bait,
+                                            substring,
+                                            bait_seq_subseq))
+
+    ham_dist_list.sort(key=lambda x: (-x[2]))
+
+    summary_dict["read_name"].append(key)
+    summary_dict["bait_name"].append(ham_dist_list[0][2])
+    summary_dict["read_length"].append(len(the_read))
+    summary_dict["closest_dist"].append(ham_dist_list[0][1])
+    summary_dict["align_len"].append(ham_dist_list[0][0])
+    gc = (ham_dist_list[0][3].upper().count("G") + ham_dist_list[0][3].upper().count("C"))/len(ham_dist_list[0][3])
+    summary_dict["align_gc"].append(gc)
+    summary_dict["seq"].append(ham_dist_list[0][3].upper())
+    summary_dict["bait_seq_subseq"].append(ham_dist_list[0][4].upper())
+
+def multi_process():
+    fasta_dict = make_fasta_dict()
+    aln_dict = make_aln_dict()
+    simulated_dict = make_simulated_dict_costume(fasta_dict, aln_dict)
+
+    p = multiprocessing.Pool(args.threads)
+    results = []
+    for simulated_read, simulated_seq in tqdm(simulated_dict.items(), desc="mapping simulated reads"):
+        results.append(p.apply_async(map_read_to_reference, args=(simulated_read, simulated_seq, aln_dict,)))
+    p.close()
+    p.join()
+
+    summary_dict = {}
+    for r in results:
+        summary_dict.update(r.get())
+
+    return summary_dict
+
+
+def calculate_mismatches(): # old code
     i=0
     dist_neg_count=0
     with open("validation_stats.tsv", "w") as file:
@@ -1807,7 +1911,10 @@ def calculate_mismatches():
             bait_list=[]
             bait_name="NA"
             pos, read_length=find_position(key)
-
+            print("___>____>")
+            print(pos)
+            print(read_length)
+            print("___<____<")
             if pos == -1:
                 file.write(key.split(" ")[0]+"\t"+ \
                             "NA" + "\t" + \
@@ -1820,7 +1927,7 @@ def calculate_mismatches():
                 continue
             
 
-
+            print(bait_dict.keys())
             miss_min = 0
             for bait in bait_dict.keys():
                 the_read = simulated_dict[key]
@@ -1833,11 +1940,11 @@ def calculate_mismatches():
                     continue
                 tile_correction = (tile_start-pos)+1
 
-                #print("\n")
-                #print("pos = " + str(pos))
-                #print("tile = " + str(tile_start))
-                #print('the_read = ' + the_read)
-                #print('bait_seq = ' + bait_dict[bait][0:(len(the_read)-tile_correction)] )
+                print("\n")
+                print("pos = " + str(pos))
+                print("tile = " + str(tile_start))
+                print('the_read = ' + the_read)
+                print('bait_seq = ' + bait_dict[bait][0:(len(the_read)-tile_correction)] )
 
                 if tile_correction>0:
                     bait_seq=bait_dict[bait][0:(len(the_read)-tile_correction)] 
@@ -1865,12 +1972,13 @@ def calculate_mismatches():
                 bait_list.append(bait)
                 miss_min = max(hamming_dist(bait_seq, the_read), miss_min)
                 ham_dist_list_dict.update({str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))):[the_read, bait,bait_seq]})
-                #print('cor read = ' + the_read)
-                #print('cor bait = ' + bait_seq)
+                print('cor read = ' + the_read)
+                print('cor bait = ' + bait_seq)
 
-
-            #print(sorted(ham_dist_list,reverse=True))
-            #print(ham_dist_list_dict)    
+            print("TRUE")
+            print(sorted(ham_dist_list,reverse=True))
+            print(ham_dist_list_dict)
+            quit()    
             if len(ham_dist_list) != 0:
                 dist_value = sorted(ham_dist_list,reverse=True)[0]
                 for I in range(len(bait_list)):
@@ -1978,8 +2086,8 @@ if __name__ == '__main__':
         #####################################################################
         #            size selection of the reference sequences              #
         #####################################################################
-    
-        size_selection()
+        if args.no_size_selection == True:
+            size_selection()
         
         #####################################################################
 
@@ -2044,5 +2152,20 @@ if __name__ == '__main__':
         simulated_dict = make_simulated_dict_costume()
         bait_dict = make_bait_dict()
         alignment_dict = make_aln_dict()
-        calculate_mismatches()
+
+        progress = tqdm(total=len(simulated_dict), desc="reads parsed ")
+        summary_dict={"read_name":[],
+                    "bait_name":[],
+                    "read_length":[],
+                    "closest_dist":[],
+                    "align_len":[],
+                    "align_gc":[],
+                    "seq":[],
+                    "bait_seq_subseq":[]}
+        #summary_dict=find_pos_2()
+        summary_dict = multi_process()
+        df = pd.DataFrame(summary_dict)
+        df.to_csv("validation_stats.tsv", sep='\t', index=False)
+
+        #calculate_mismatches()
         print_pandas()
