@@ -71,33 +71,33 @@ parser.formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog, max_he
 formatter_class=argparse.RawTextHelpFormatter
 
 man = parser.add_argument_group('MARKER')
-man.add_argument('-m', '--marker', metavar=r'\b', choices=['COI-5P', 'COI-3P', 'rbcL', 'matK', 'ITS', 'coding' , 'noncoding'], help='can be COI/rbcL/matK/ITS or coding/noncoding using custom .fna/.aln')
-man.add_argument('-c', '--code', metavar=r'\b', help='genetic code - e.g. 1 for plastid and nuclear, 5 for mitochondrial invertebrate')
+man.add_argument('-m', '--marker', metavar='\b', choices=['COI-5P', 'COI-3P', 'rbcL', 'matK', 'ITS', 'coding' , 'noncoding'], help='can be COI/rbcL/matK/ITS or coding/noncoding using custom .fna/.aln')
+man.add_argument('-c', '--code', metavar='\b', help='genetic code - e.g. 1 for plastid and nuclear, 5 for mitochondrial invertebrate')
 
 bld = parser.add_argument_group('BOLD DOWNLOAD')
-bld.add_argument('-t', '--taxa', metavar=r'\b', help='input taxa')
-bld.add_argument('-g', '--geo', metavar=r'\b', default="", help='geographic location of samples')
-bld.add_argument('-ft', '--filter_tax', metavar=r'\b', default="", choices=['species', 'genus', 'family'], help='can be species/genus/family - defeault is none')
-bld.add_argument("-bp", "--boldcli_path", metavar=r'\b', default="bold-cli", help="path to bold-cli")
+bld.add_argument('-t', '--taxa', metavar='\b', help='input taxa')
+bld.add_argument('-g', '--geo', metavar='\b', default="", help='geographic location of samples')
+bld.add_argument('-ft', '--filter_tax', metavar='\b', default="", choices=['species', 'genus', 'family'], help='can be species/genus/family - defeault is none')
+bld.add_argument("-bp", "--boldcli_path", metavar='\b', default="bold-cli", help="path to bold-cli")
 
 ctm = parser.add_argument_group('CUSTOM INPUTS')
-ctm.add_argument('-cf', '--custom_fna', metavar=r'\b', default="", help='custom nucleotide sequences file (.fasta format)')
-ctm.add_argument('-ca', '--custom_aln', metavar=r'\b', default="", help='custom nucleotide alignment file (.fasta format) - gotcha will jump to size selection')
-ctm.add_argument('-cn', '--custom_nwk', metavar=r'\b', default="", help='custom newick file - tree can be multifurcating and can lack taxa')
+ctm.add_argument('-cf', '--custom_fna', metavar='\b', default="", help='custom nucleotide sequences file (.fasta format)')
+ctm.add_argument('-ca', '--custom_aln', metavar='\b', default="", help='custom nucleotide alignment file (.fasta format) - gotcha will jump to size selection')
+ctm.add_argument('-cn', '--custom_nwk', metavar='\b', default="", help='custom newick file - tree can be multifurcating and can lack taxa')
 
 par = parser.add_argument_group('BAITS SEARCH PARAMETERS')
-par.add_argument('-fl', '--filter_len', metavar=r'\b', default=100, help='minimum amminoacids / nucleotides length - default is 100', type=check_positive)
-par.add_argument('-sc', '--seq_collapse', metavar=r'\b', type=float, default=1, help='percent identity to collapse sequences - default is 1')
-par.add_argument('-bc', '--bts_collapse', metavar=r'\b', type=float, default=1, help='percent identity to collapse baits - defeault is 1')
-par.add_argument('-bl', "--baitlength", metavar=r'\b', type=int, default=80, help='lenght of the bait sequences - default is 80')
-par.add_argument('-tl', "--tiling", metavar=r'\b', default=30, type=int, help='kmer tiling for ancestral node selection - default is 30') #changed the default from 10 to 30 (think most cases ~3x coverage is alright and for a 80mer, that would be ~30)
-par.add_argument('-ds', "--distance", metavar=r'\b', type=float, default=0.09, help='maximal distance to the ancestral node - default is 0.09')
-par.add_argument('-so', "--trim_seqoverlap", metavar=r'\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
-par.add_argument('-ro', "--trim_resoverlap", metavar=r'\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
-par.add_argument('-dt', "--dust_threshold", metavar=r'\b', default=10, help='score threshold for low complexity region masking - default is 10')
-par.add_argument('-mf', "--max_farg_lenght", metavar=r'\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
+par.add_argument('-fl', '--filter_len', metavar='\b', default=100, help='minimum amminoacids / nucleotides length - default is 100', type=check_positive)
+par.add_argument('-sc', '--seq_collapse', metavar='\b', type=float, default=1, help='percent identity to collapse sequences - default is 1')
+par.add_argument('-bc', '--bts_collapse', metavar='\b', type=float, default=1, help='percent identity to collapse baits - defeault is 1')
+par.add_argument('-bl', "--baitlength", metavar='\b', type=int, default=80, help='lenght of the bait sequences - default is 80')
+par.add_argument('-tl', "--tiling", metavar='\b', default=30, type=int, help='kmer tiling for ancestral node selection - default is 30') #changed the default from 10 to 30 (think most cases ~3x coverage is alright and for a 80mer, that would be ~30)
+par.add_argument('-ds', "--distance", metavar='\b', type=float, default=0.09, help='maximal distance to the ancestral node - default is 0.09')
+par.add_argument('-so', "--trim_seqoverlap", metavar='\b', default="", help='trimal param between 0 and 100 - if not specified will skip')
+par.add_argument('-ro', "--trim_resoverlap", metavar='\b', default="", help='trimal param between 1 and 0 - if not specified will skip')
+par.add_argument('-dt', "--dust_threshold", metavar='\b', default=10, help='score threshold for low complexity region masking - default is 10')
+par.add_argument('-mf', "--max_farg_lenght", metavar='\b', default=3000, type=int, help='this value can restrain the selected fragment size by choosing the optimal fragment below this value, \
                                                                                                                                                                                 \ndefault will take the highest value if number of sequences multiplied by fragment size') #new in version 2.3.2
-par.add_argument('-GC', "--GC_threshold", metavar=r'\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
+par.add_argument('-GC', "--GC_threshold", metavar='\b', default="0.30-0.70", help='GC range for bait filtering - default is 0.30-0.70')
 par.add_argument('-ks', "--keep_short_sequences", help='keep short sequences in size selection step', action='store_true')
 par.add_argument('-fs', '--fast', action='store_true', help='performs the fast baits search w/out ancestral state reconstruction')
 par.add_argument('-mc', '--manual_check', action='store_true', help='stops prior to tree inference for a manual check of the alignment')
@@ -105,17 +105,17 @@ par.add_argument('-mc', '--manual_check', action='store_true', help='stops prior
 fal = parser.add_argument_group('VALIDATION')
 fal.add_argument('-VR', "--run_validation", help='Run bait validation with simulated data', action='store_true')
 fal.add_argument('-VO', "--run_validation_only",  help='Run only the bait validation with simulated data', action='store_true')
-fal.add_argument('-ns', "--n_simulated",metavar=r'\b',  default=10000, type=int, help='number of reads to simulate')
-fal.add_argument('-dp', "--distribution_par",metavar=r'\b',  default="50:50:35",  help='distribution for reads simulation min_read_length:mean:sd of normal distribution')
-fal.add_argument('-mo', "--min_overlap", metavar=r'\b', default=20, type=int, help='min overlap read to bait to be considered in calculation')
+fal.add_argument('-ns', "--n_simulated",metavar='\b',  default=10000, type=int, help='number of reads to simulate')
+fal.add_argument('-dp', "--distribution_par",metavar='\b',  default="50:50:35",  help='distribution for reads simulation min_read_length:mean:sd of normal distribution')
+fal.add_argument('-mo', "--min_overlap", metavar='\b', default=20, type=int, help='min overlap read to bait to be considered in calculation')
 
 otr = parser.add_argument_group('OTHER')
 otr.add_argument("-h", "--help", action="help", help="show this help message and exit")
 otr.add_argument("-path", default=".", help=argparse.SUPPRESS)
-otr.add_argument('-o', '--out', metavar=r'\b', default="probes", help='basename of output file and folders - default is probes')
+otr.add_argument('-o', '--out', metavar='\b', default="probes", help='basename of output file and folders - default is probes')
 otr.add_argument('-v', '--verbose', action='store_false', help='keeps temporary folder and files')
 otr.add_argument('-e', '--erase', action='store_true', help='erases and rewrites a pre existing output folder')
-otr.add_argument('-th', '--threads', metavar=r'\b', type=check_positive, default=1, help='number of threads used for tree inference - default is 1')
+otr.add_argument('-th', '--threads', metavar='\b', type=check_positive, default=1, help='number of threads used for tree inference - default is 1')
 otr.add_argument('--version', action='store_true', help="show program's version number")
 
 args=parser.parse_args()
@@ -697,16 +697,6 @@ def size_selection():
         start_position_list.append(start_position)
         end_position_list.append(finish_position)
         
-        #data = pd.Series({'threshold':str(treshold)+"%",
-        #    'number of sequences':count,
-        #    'seq_length':int(re.sub(",.*", "", re.sub("\(", "", str(Counter(lenght_no_gaps).most_common()[0])))), #statistics.mode(lenght_no_gaps), 
-        #    'number * lenght':count*len(input_sequences[i].seq[start_position:finish_position]),
-        #    'start position':start_position,
-        #    'finish_position':finish_position})
-        #fragment_selections = fragment_selections.append(pd.DataFrame(data), ignore_index=True)
-        #fragment_selections = fragment_selections.append(pd.DataFrame(data), ignore_index=True)
-        #fragment_selections = pd.concat([fragment_selections, data.to_frame().T], ignore_index=True)
-        #progress.update()
     fragment_selections = {'threshold':threshold_list, 
                                         'number of sequences':number_of_sequences_list,
                                         'seq_length':seq_length_list,
@@ -736,15 +726,10 @@ def size_selection():
         if fragment_selections['seq_length'][i] >= args.max_farg_lenght:
             continue
         if((fragment_selections["number * lenght"][i]==max(fragment_selections['number * lenght']))==True):
-            #optimal_threshold=fragment_selections.loc[i, 'threshold']
             find_optimal_fragment=True
             start_position=fragment_selections['start position'][i]
-            #start_position=fragment_selections.loc[i,'start position']
             finish_position=fragment_selections['finish_position'][i]
-            #finish_position=fragment_selections.loc[i,'finish_position']
             selected_size=fragment_selections['seq_length'][i]
-            #selected_size=fragment_selections.loc[i,'seq_length']
-        #seq_count=fragment_selections.loc[i, 'number of sequences']
         seq_count=fragment_selections['number of sequences'][i]
         i=i+1
 
@@ -752,18 +737,11 @@ def size_selection():
     while not (((finish_position-start_position)/3.0).is_integer()):
         finish_position-=1
         lenght=((finish_position-start_position)/3.0)
-
-    #correcting size for the triplet cutoff (prevent sequences being lost due to gaps)
-    #count_eng_gap=0
     frag_count=0
     
     while not (seq_count<=(frag_count)):
-        #count_eng_gap=0
         frag_count=0
         for i in range(len(input_sequences)):
-            #if(len(re.findall("-$", (str(input_sequences[i].seq[start_position:finish_position]))))!=0):
-            #    count_eng_gap+=1
-            # ^-|-$|^N|N$
             if(len(re.findall("$-|$N", (str(input_sequences[i].seq[start_position:finish_position]))))==0):
                 frag_count+=1
         if seq_count>=frag_count :
@@ -771,12 +749,8 @@ def size_selection():
     
     frag_count=0
     while not (seq_count<=(frag_count)):
-        #count_eng_gap=0
         frag_count=0
         for i in range(len(input_sequences)):
-            #if(len(re.findall("-$", (str(input_sequences[i].seq[start_position:finish_position]))))!=0):
-            #    count_eng_gap+=1
-            # ^-|-$|^N|N$
             if(len(re.findall("^-|^N", (str(input_sequences[i].seq[start_position:finish_position]))))==0):
                 frag_count+=1
         if seq_count>=frag_count :
