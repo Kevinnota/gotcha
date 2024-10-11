@@ -129,14 +129,15 @@ def check_if_all_is_installed():
         print('\ngotcha version 5.0.0 built March 2023\ndeveloped by Kevin Nota & Giobbe Forni\n')
         exit()
 
-
     if args.boldcli_path != "bold-cli" :
         args.boldcli_path = args.boldcli_path
-    rc = subprocess.call(['which', args.boldcli_path],stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-    
-    if rc != 0 and not args.custom_fna and not args.custom_aln and not args.custom_nwk:
-        print('bold-cli\tmissing in path')
-        exit()
+
+    if not args.custom_fna and not args.custom_aln and not args.custom_nwk:
+        rc = subprocess.call(['which', args.boldcli_path],stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+        if rc != 0:
+            print('bold-cli\tmissing in path')
+            exit()
 
     rc = subprocess.call(['which', 'baseml'],stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
     if rc != 0:
