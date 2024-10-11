@@ -21,13 +21,13 @@
 import re
 import os
 import re
-import sys
-import glob
+#import sys
+#import glob
 import shutil
 import os.path
 import datetime
 import argparse
-import operator
+#import operator
 import subprocess
 from os import path
 import pandas as pd
@@ -35,13 +35,13 @@ from tqdm import tqdm
 from Bio import SeqIO
 from Bio import AlignIO
 from Bio.Seq import Seq
-from Bio.SeqIO import FastaIO
+#from Bio.SeqIO import FastaIO
 from Bio.SeqRecord import SeqRecord
-from Bio.Align.Applications import MafftCommandline
-import ete3 #new v2.2.2
+#from Bio.Align.Applications import MafftCommandline
+#import ete3 #new v2.2.2
 from ete3 import Tree  #new v2.2.2
 from statistics import mean #new v2.2.2
-import statistics #new v2.3.2
+#import statistics #new v2.3.2
 from collections import Counter #new v2.2.2
 from numpy import random # new v3
 import matplotlib.pyplot as plt # new v3
@@ -65,7 +65,7 @@ def check_positive(value):
         raise Exception("{} is not an integer".format(value))
     return value
 
-parser = argparse.ArgumentParser(prog='gotcha', description='gotcha version 1.0.0 built Feb 2023\ndeveloped by Kevin Nota & Giobbe Forni\n',add_help=False)
+parser = argparse.ArgumentParser(prog='gotcha', description='gotcha version 5.0.0 built March 2023\ndeveloped by Kevin Nota & Giobbe Forni\n',add_help=False)
 
 parser.formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog, max_help_position=150)
 formatter_class=argparse.RawTextHelpFormatter
@@ -129,10 +129,12 @@ def check_if_all_is_installed():
         print('\ngotcha version 5.0.0 built March 2023\ndeveloped by Kevin Nota & Giobbe Forni\n')
         exit()
 
+
     if args.boldcli_path != "bold-cli" :
         args.boldcli_path = args.boldcli_path
     rc = subprocess.call(['which', args.boldcli_path],stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-    if rc != 0 and not args.custom_fna:
+    
+    if rc != 0 and not args.custom_fna and not args.custom_aln and not args.custom_nwk:
         print('bold-cli\tmissing in path')
         exit()
 

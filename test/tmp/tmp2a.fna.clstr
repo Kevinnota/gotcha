@@ -1,0 +1,500 @@
+>Cluster 0
+0	507aa, >GBVX7606-15... *
+>Cluster 1
+0	507aa, >GBVP5261-15... *
+>Cluster 2
+0	507aa, >GBVP5258-15... *
+>Cluster 3
+0	507aa, >CRCZ1483-16... *
+>Cluster 4
+0	507aa, >GBVG2288-11... *
+>Cluster 5
+0	507aa, >GBVG442-11... *
+>Cluster 6
+0	507aa, >API328-14... *
+>Cluster 7
+0	507aa, >GBVG457-11... *
+>Cluster 8
+0	507aa, >GBVG456-11... *
+>Cluster 9
+0	507aa, >JWP6643-20... *
+>Cluster 10
+0	507aa, >GBVG436-11... *
+>Cluster 11
+0	507aa, >GBVG2289-11... *
+>Cluster 12
+0	507aa, >JWP986-11... *
+>Cluster 13
+0	507aa, >GBVP8162-15... *
+>Cluster 14
+0	507aa, >SBIO019-17... *
+1	507aa, >GBVP7491-15... at 100.00%
+>Cluster 15
+0	507aa, >GBVG2301-11... *
+1	507aa, >GBVG2282-11... at 100.00%
+2	507aa, >GBVG2307-11... at 100.00%
+3	507aa, >EBLF1659-22... at 100.00%
+4	507aa, >GBVG2320-11... at 100.00%
+5	507aa, >GBVP8151-15... at 100.00%
+6	507aa, >JWP2814-11... at 100.00%
+>Cluster 16
+0	507aa, >EBLF1780-22... *
+>Cluster 17
+0	507aa, >GBVP8423-15... *
+>Cluster 18
+0	507aa, >EBLF119-22... *
+>Cluster 19
+0	507aa, >EBLF731-22... *
+1	507aa, >GBVX5917-15... at 100.00%
+2	507aa, >GBVG2291-11... at 100.00%
+3	507aa, >EBLF1342-22... at 100.00%
+4	507aa, >EBLF3151-22... at 100.00%
+>Cluster 20
+0	507aa, >GBVG2324-11... *
+>Cluster 21
+0	507aa, >GBVX2638-15... *
+1	507aa, >GBVG2280-11... at 100.00%
+2	507aa, >EBLF253-22... at 100.00%
+3	507aa, >EBLF1745-22... at 100.00%
+>Cluster 22
+0	507aa, >GBVP8149-15... *
+>Cluster 23
+0	507aa, >EBLF937-22... *
+1	507aa, >GBVG2316-11... at 100.00%
+>Cluster 24
+0	507aa, >JWP1620-11... *
+>Cluster 25
+0	507aa, >JWP1816-11... *
+>Cluster 26
+0	507aa, >GBVF4970-11... *
+>Cluster 27
+0	507aa, >GBVP5253-15... *
+>Cluster 28
+0	507aa, >GBVG432-11... *
+>Cluster 29
+0	507aa, >GBVP8148-15... *
+>Cluster 30
+0	507aa, >GBVG431-11... *
+1	507aa, >JWP2003-11... at 100.00%
+>Cluster 31
+0	507aa, >GBVG430-11... *
+1	507aa, >GBVG425-11... at 100.00%
+>Cluster 32
+0	507aa, >JWP764-11... *
+>Cluster 33
+0	507aa, >GBVF1094-11... *
+>Cluster 34
+0	507aa, >GBVF4926-11... *
+>Cluster 35
+0	507aa, >GBVF1085-11... *
+1	507aa, >GBVF1064-11... at 100.00%
+2	507aa, >GBVF1073-11... at 100.00%
+3	507aa, >GBVF1098-11... at 100.00%
+>Cluster 36
+0	507aa, >GBVF1071-11... *
+>Cluster 37
+0	507aa, >GBVF1082-11... *
+>Cluster 38
+0	507aa, >GBVY2336-14... *
+>Cluster 39
+0	507aa, >GBVG418-11... *
+>Cluster 40
+0	507aa, >GBVP5259-15... *
+>Cluster 41
+0	507aa, >GBVG191-11... *
+>Cluster 42
+0	507aa, >GBVR2215-13... *
+>Cluster 43
+0	507aa, >GBVF4922-11... *
+>Cluster 44
+0	507aa, >JWP3633-11... *
+1	507aa, >JWP1685-11... at 100.00%
+2	507aa, >GBVX1897-13... at 100.00%
+3	507aa, >EBLF1226-22... at 100.00%
+4	507aa, >EBLF1718-22... at 100.00%
+>Cluster 45
+0	507aa, >GBVG232-11... *
+>Cluster 46
+0	507aa, >JWP1714-11... *
+1	507aa, >JWP168-11... at 100.00%
+2	507aa, >JWP3026-11... at 100.00%
+3	507aa, >GBVG071-11... at 100.00%
+4	507aa, >JWP6292-20... at 100.00%
+5	507aa, >EBLF1005-22... at 100.00%
+6	507aa, >GBVX5907-15... at 100.00%
+7	507aa, >EBLF1952-22... at 100.00%
+8	507aa, >GBVG193-11... at 100.00%
+9	507aa, >EBLF1062-22... at 100.00%
+10	507aa, >EBLF1627-22... at 100.00%
+11	507aa, >EBLF2534-22... at 100.00%
+12	507aa, >EBLF549-22... at 100.00%
+>Cluster 47
+0	507aa, >JWP4411-12... *
+>Cluster 48
+0	507aa, >GBVG210-11... *
+1	507aa, >BABRU2947-15... at 100.00%
+2	507aa, >BABRU2352-15... at 100.00%
+3	507aa, >EBLF1746-22... at 100.00%
+4	507aa, >GBVG137-11... at 100.00%
+5	507aa, >GBVG058-11... at 100.00%
+6	507aa, >GBVG306-11... at 100.00%
+7	507aa, >GBVP8147-15... at 100.00%
+8	507aa, >EBLF1742-22... at 100.00%
+9	507aa, >GBVF4952-11... at 100.00%
+10	507aa, >GBVF4956-11... at 100.00%
+11	507aa, >EBLF1080-22... at 100.00%
+12	507aa, >GBVX1979-13... at 100.00%
+13	507aa, >ATG011-14... at 100.00%
+14	507aa, >GBVG417-11... at 100.00%
+15	507aa, >GBVG136-11... at 100.00%
+16	507aa, >GBVG405-11... at 100.00%
+17	507aa, >CRCZ2214-16... at 100.00%
+18	507aa, >FAGRB009-22... at 100.00%
+>Cluster 49
+0	507aa, >JWP4610-12... *
+1	507aa, >GBVG061-11... at 100.00%
+>Cluster 50
+0	507aa, >BABRU2318-15... *
+>Cluster 51
+0	507aa, >GBVF4915-11... *
+>Cluster 52
+0	507aa, >GBVY2678-14... *
+>Cluster 53
+0	507aa, >GBVG180-11... *
+>Cluster 54
+0	507aa, >GBVX5909-15... *
+>Cluster 55
+0	507aa, >EBLF1927-22... *
+1	507aa, >GBVX5906-15... at 100.00%
+2	507aa, >GBVP8146-15... at 100.00%
+>Cluster 56
+0	507aa, >EBLF1297-22... *
+>Cluster 57
+0	507aa, >GBVG047-11... *
+>Cluster 58
+0	507aa, >EBLF2793-22... *
+>Cluster 59
+0	507aa, >EBLF3035-22... *
+>Cluster 60
+0	507aa, >GBVG064-11... *
+>Cluster 61
+0	507aa, >GBVG365-11... *
+>Cluster 62
+0	507aa, >GBVG173-11... *
+>Cluster 63
+0	507aa, >EBLF478-22... *
+>Cluster 64
+0	507aa, >JWP5603-20... *
+1	507aa, >GBVF4895-11... at 100.00%
+>Cluster 65
+0	507aa, >GBVP6093-15... *
+>Cluster 66
+0	507aa, >GBVP5254-15... *
+1	507aa, >GBVG078-11... at 100.00%
+>Cluster 67
+0	507aa, >EBLF773-22... *
+1	507aa, >GBVX5905-15... at 100.00%
+2	507aa, >GBVX5908-15... at 100.00%
+3	507aa, >GBVG116-11... at 100.00%
+4	507aa, >GBVF4938-11... at 100.00%
+5	507aa, >GBVG326-11... at 100.00%
+6	507aa, >GBVG149-11... at 100.00%
+7	507aa, >JWP584-11... at 100.00%
+8	507aa, >JWP6293-20... at 100.00%
+9	507aa, >JWP1648-11... at 100.00%
+10	507aa, >EBLF1074-22... at 100.00%
+11	507aa, >EBLF1004-22... at 100.00%
+12	507aa, >GBVG156-11... at 100.00%
+13	507aa, >GBVG353-11... at 100.00%
+14	507aa, >GBVG298-11... at 100.00%
+15	507aa, >GBVG228-11... at 100.00%
+>Cluster 68
+0	507aa, >GBVX5910-15... *
+1	507aa, >CPBOL742-11... at 100.00%
+2	507aa, >EBLF2786-22... at 100.00%
+3	507aa, >EBLF1050-22... at 100.00%
+4	507aa, >EBLF1717-22... at 100.00%
+>Cluster 69
+0	507aa, >CPBOL728-11... *
+1	507aa, >EBLF1343-22... at 100.00%
+2	507aa, >EBLF2305-22... at 100.00%
+3	507aa, >EBLF1204-22... at 100.00%
+>Cluster 70
+0	507aa, >JWP1509-11... *
+>Cluster 71
+0	507aa, >JWP937-11... *
+>Cluster 72
+0	507aa, >GBVY1253-14... *
+>Cluster 73
+0	507aa, >GBVG178-11... *
+>Cluster 74
+0	507aa, >GBVG437-11... *
+>Cluster 75
+0	507aa, >GBVG433-11... *
+>Cluster 76
+0	507aa, >GBVG450-11... *
+>Cluster 77
+0	507aa, >GBVG449-11... *
+>Cluster 78
+0	507aa, >GBVR2218-13... *
+>Cluster 79
+0	507aa, >GBVR2222-13... *
+>Cluster 80
+0	507aa, >GBVR2272-13... *
+>Cluster 81
+0	507aa, >GBVG452-11... *
+1	507aa, >GBVG438-11... at 100.00%
+>Cluster 82
+0	507aa, >GBVG454-11... *
+1	507aa, >GBVR2220-13... at 100.00%
+>Cluster 83
+0	507aa, >GBVG446-11... *
+>Cluster 84
+0	507aa, >GBVG445-11... *
+>Cluster 85
+0	507aa, >GBVR2219-13... *
+1	507aa, >GBVG460-11... at 100.00%
+>Cluster 86
+0	507aa, >GBVR2217-13... *
+>Cluster 87
+0	507aa, >GBVR2221-13... *
+>Cluster 88
+0	507aa, >GBVG448-11... *
+>Cluster 89
+0	507aa, >GBVH4421-11... *
+>Cluster 90
+0	507aa, >GBVG447-11... *
+1	507aa, >GBVG455-11... at 100.00%
+>Cluster 91
+0	507aa, >GBVG443-11... *
+>Cluster 92
+0	507aa, >GBVG439-11... *
+>Cluster 93
+0	507aa, >GBVG440-11... *
+>Cluster 94
+0	507aa, >JWP2098-11... *
+>Cluster 95
+0	507aa, >JWP3107-11... *
+>Cluster 96
+0	507aa, >GBVG461-11... *
+>Cluster 97
+0	507aa, >GBVP5263-15... *
+>Cluster 98
+0	507aa, >GBVP8154-15... *
+>Cluster 99
+0	507aa, >GBVP7499-15... *
+>Cluster 100
+0	507aa, >GBVT3533-13... *
+1	507aa, >GBVF4767-11... at 100.00%
+>Cluster 101
+0	507aa, >JWP4636-12... *
+>Cluster 102
+0	507aa, >GBVX3111-15... *
+>Cluster 103
+0	507aa, >GBVP7500-15... *
+1	507aa, >JWP3040-11... at 100.00%
+2	507aa, >EBLF1219-22... at 100.00%
+3	507aa, >GBVF4829-11... at 100.00%
+4	507aa, >GBVF4813-11... at 100.00%
+>Cluster 104
+0	507aa, >JWP1394-11... *
+1	507aa, >JWP1074-11... at 100.00%
+>Cluster 105
+0	507aa, >JWP1025-11... *
+1	507aa, >JWP4291-12... at 100.00%
+>Cluster 106
+0	507aa, >JWP2351-11... *
+1	507aa, >JWP1121-11... at 100.00%
+>Cluster 107
+0	507aa, >GBVF4766-11... *
+1	507aa, >EDTOL334-21... at 100.00%
+>Cluster 108
+0	507aa, >GBVF4769-11... *
+>Cluster 109
+0	507aa, >JWP2459-11... *
+1	507aa, >GBVP5265-15... at 100.00%
+2	507aa, >EBLF1413-22... at 100.00%
+3	507aa, >EBLF2821-22... at 100.00%
+4	507aa, >JWP3143-11... at 100.00%
+5	507aa, >JWP3182-11... at 100.00%
+6	507aa, >EBLF027-22... at 100.00%
+>Cluster 110
+0	507aa, >GBVF4781-11... *
+1	507aa, >EBLF1225-22... at 100.00%
+2	507aa, >EBLF1732-22... at 100.00%
+3	507aa, >EBLF1216-22... at 100.00%
+4	507aa, >JWP3002-11... at 100.00%
+5	507aa, >JWP2860-11... at 100.00%
+6	507aa, >JWP1702-11... at 100.00%
+7	507aa, >JWP6378-20... at 100.00%
+8	507aa, >JWP6366-20... at 100.00%
+>Cluster 111
+0	507aa, >GBVP5264-15... *
+>Cluster 112
+0	507aa, >JWP6590-20... *
+>Cluster 113
+0	507aa, >EDTOL012-21... *
+>Cluster 114
+0	507aa, >GBVF4718-11... *
+>Cluster 115
+0	507aa, >GBVF4634-11... *
+>Cluster 116
+0	507aa, >GBVF4632-11... *
+>Cluster 117
+0	507aa, >GBVF4879-11... *
+>Cluster 118
+0	507aa, >GBVF4743-11... *
+1	507aa, >GBVP7734-15... at 100.00%
+2	507aa, >GBVP4920-15... at 100.00%
+3	507aa, >GBVP8161-15... at 100.00%
+4	507aa, >EBLF743-22... at 100.00%
+5	507aa, >JWP1619-11... at 100.00%
+6	507aa, >JWP1491-11... at 100.00%
+7	507aa, >JWP6268-20... at 100.00%
+8	507aa, >JWP6622-20... at 100.00%
+9	507aa, >EBLF2877-22... at 100.00%
+10	507aa, >JWP1850-11... at 100.00%
+>Cluster 119
+0	507aa, >GBVF4844-11... *
+>Cluster 120
+0	507aa, >GBVF4652-11... *
+>Cluster 121
+0	507aa, >GBVF4616-11... *
+1	507aa, >GBVF4606-11... at 100.00%
+2	507aa, >GBVF4655-11... at 100.00%
+3	507aa, >GBVF4640-11... at 100.00%
+4	507aa, >GBVF4619-11... at 100.00%
+5	507aa, >GBVP7494-15... at 100.00%
+6	507aa, >GBVF4628-11... at 100.00%
+7	507aa, >GBVP8424-15... at 100.00%
+8	507aa, >GBVP4853-15... at 100.00%
+9	507aa, >GBVF4657-11... at 100.00%
+10	507aa, >GBVF4609-11... at 100.00%
+11	507aa, >GBVF4662-11... at 100.00%
+12	507aa, >JWP6335-20... at 100.00%
+13	507aa, >JWP3128-11... at 100.00%
+14	507aa, >JWP2737-11... at 100.00%
+15	507aa, >JWP6431-20... at 100.00%
+16	507aa, >GBVF4624-11... at 100.00%
+17	507aa, >EBLF1326-22... at 100.00%
+18	507aa, >EBLF3140-22... at 100.00%
+>Cluster 122
+0	507aa, >GBVF4618-11... *
+1	507aa, >JWP708-11... at 100.00%
+>Cluster 123
+0	507aa, >GBVF4614-11... *
+1	507aa, >EBLF1250-22... at 100.00%
+>Cluster 124
+0	507aa, >GBVP7495-15... *
+>Cluster 125
+0	507aa, >GBVF4705-11... *
+>Cluster 126
+0	507aa, >GBVP6094-15... *
+>Cluster 127
+0	507aa, >JWP4243-12... *
+1	507aa, >JWP2464-11... at 100.00%
+>Cluster 128
+0	507aa, >JWP4385-12... *
+>Cluster 129
+0	507aa, >JWP4359-12... *
+>Cluster 130
+0	507aa, >GBVF4623-11... *
+>Cluster 131
+0	507aa, >JWP4466-12... *
+>Cluster 132
+0	507aa, >FPOON279-16... *
+>Cluster 133
+0	507aa, >EBLF259-22... *
+1	507aa, >GBVF4625-11... at 100.00%
+>Cluster 134
+0	507aa, >CPBOL2311-11... *
+>Cluster 135
+0	507aa, >CPBOL2318-11... *
+>Cluster 136
+0	507aa, >CPBOL2322-11... *
+>Cluster 137
+0	507aa, >JWP1879-11... *
+>Cluster 138
+0	507aa, >JWP1880-11... *
+>Cluster 139
+0	507aa, >GBVH4434-11... *
+>Cluster 140
+0	507aa, >GBVF1059-11... *
+>Cluster 141
+0	507aa, >GBVG021-11... *
+>Cluster 142
+0	507aa, >GBVF1031-11... *
+>Cluster 143
+0	507aa, >GBVF986-11... *
+>Cluster 144
+0	507aa, >GBVF1010-11... *
+>Cluster 145
+0	507aa, >GBVF1032-11... *
+1	507aa, >GBVF1042-11... at 100.00%
+2	507aa, >GBVF1021-11... at 100.00%
+>Cluster 146
+0	507aa, >GBVF1023-11... *
+>Cluster 147
+0	507aa, >GBVF1033-11... *
+1	507aa, >GBVF1034-11... at 100.00%
+2	507aa, >GENG828-14... at 100.00%
+3	507aa, >TDEF105-12... at 100.00%
+>Cluster 148
+0	507aa, >GBVF970-11... *
+>Cluster 149
+0	507aa, >GBVF949-11... *
+>Cluster 150
+0	507aa, >GBVF1006-11... *
+>Cluster 151
+0	507aa, >GBVF1022-11... *
+>Cluster 152
+0	507aa, >JWP6568-20... *
+>Cluster 153
+0	507aa, >GBVG022-11... *
+>Cluster 154
+0	507aa, >FPOON176-16... *
+>Cluster 155
+0	507aa, >GBVG465-11... *
+>Cluster 156
+0	507aa, >JWP6585-20... *
+>Cluster 157
+0	507aa, >GBVH4424-11... *
+>Cluster 158
+0	507aa, >GBVH4428-11... *
+1	507aa, >GBVH4436-11... at 100.00%
+2	507aa, >GBVH4435-11... at 100.00%
+3	507aa, >GBVH4426-11... at 100.00%
+4	507aa, >GBVH4443-11... at 100.00%
+5	507aa, >API261-12... at 100.00%
+>Cluster 159
+0	507aa, >GBVH4442-11... *
+1	507aa, >GBVH4444-11... at 100.00%
+>Cluster 160
+0	507aa, >GBVH4448-11... *
+1	507aa, >EDTOL1195-22... at 100.00%
+>Cluster 161
+0	507aa, >JWP5646-20... *
+1	507aa, >JWP1217-11... at 100.00%
+2	507aa, >EBLF507-22... at 100.00%
+3	507aa, >JWP217-11... at 100.00%
+4	507aa, >GBVH4446-11... at 100.00%
+>Cluster 162
+0	507aa, >JWP2994-11... *
+>Cluster 163
+0	507aa, >GBVF4987-11... *
+>Cluster 164
+0	507aa, >GBVG042-11... *
+1	507aa, >EDTOL348-21... at 100.00%
+>Cluster 165
+0	507aa, >GBVF4988-11... *
+1	507aa, >GBVX3110-15... at 100.00%
+2	507aa, >JWP2982-11... at 100.00%
+3	507aa, >JWP6326-20... at 100.00%
+4	507aa, >JWP1711-11... at 100.00%
+>Cluster 166
+0	507aa, >GBVX3109-15... *
+1	507aa, >EBLF1340-22... at 100.00%
+>Cluster 167
+0	507aa, >GBVG035-11... *
+1	507aa, >JWP6403-20... at 100.00%
+2	507aa, >JWP3098-11... at 100.00%

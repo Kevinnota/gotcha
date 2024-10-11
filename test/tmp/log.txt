@@ -1,0 +1,29 @@
+# analysis started on 2024-10-11 14:03:17
+
+
+	 INPUTS:
+
+	 BOLD TAXONOMY 		N
+	 CUSTOM SEQUENCES 	Y
+	 CUSTOM ALIGNMENT 	N
+	 CUSTOM TREE 		N
+	 MARKER 		COI-5P
+	 GEN CODE 		4
+	 FAST MODE 		N
+
+
+	 PARAMETERS:
+
+	 TAXONOMIC FILTER 	N
+	 MIN MARKER LENGTH 	100
+	 MAX MARKER IDENTITY 	1
+	 BAITS LENGTH 		80
+	 BAITS TILING 		30
+	 GC THRESHOLD 		0.30-0.70
+	 TRIMAL 		N
+	 DUST TRESHOLD 		10
+	 168	 after identity collapse
+	 168	 removing sequences with non ATGC nucleotides
+	 168	 after length filter
+	 168	 the removal of sequences with stop codons
+	 168	 after size selection
