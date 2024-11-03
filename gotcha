@@ -17,6 +17,7 @@
         # Fixed gap problem with selecting baits (no bait should have a gap)
         # Fixed problem with node selection. There is a problem that sequence close to the root are placed on tips.
         # Fixed, for each tip sequence look back into the tree to the closest ancestral node.
+        # outputs a fasta file useful for bait validation.
 
 import re
 import os
@@ -761,8 +762,15 @@ def size_selection():
 
     #Creating new fasta file with original labels but new sequence
     new_fasta=list()
+    fasta_for_validation=list() # creates a file with all sequences that are usefull for testing the probes.
+    
     frag_count=0
     for i in range(len(input_sequences)):
+        new_seq=SeqRecord(Seq(str(input_sequences[i].seq[start_position:finish_position])),
+        id=input_sequences[i].id,
+        description="")
+        fasta_for_validation.append(new_seq)
+        
         if args.keep_short_sequences == True : 
             new_seq=SeqRecord(Seq(str(input_sequences[i].seq[start_position:finish_position])),
             id=input_sequences[i].id,
@@ -776,12 +784,17 @@ def size_selection():
                 description="")
                 new_fasta.append(new_seq)
                 frag_count+=1
+        
+
 
     #Writing the new fasta to tmp folder
     SeqIO.write(new_fasta, "size_selected.fasta", "fasta") #path to the output file
     os.rename("tmp.aln", "no_size_selection.fasta")
     shutil.copy('size_selected.fasta', 'tmp.aln')
     #os.rename("size_selected.fasta", "tmp.aln")
+
+   #Writing the new fasta to tmp folder
+    SeqIO.write(fasta_for_validation, "trimmed_seq_for_validation.fasta", "fasta") #path to the output file
 
     #print("optimal missing data threshold = "+str(optimal_threshold)) #removed v2.3.2
     print("#\tkept:\t\t"+str(frag_count))

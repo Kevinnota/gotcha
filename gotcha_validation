@@ -8,11 +8,14 @@ from numpy import random
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from multiprocessing import Pool
+from collections import Counter
+import pandas as pd
+import subprocess
 
 parser = argparse.ArgumentParser(prog='Check baits produced by gotcha', description='Check baits produced by gotcha')
 parser.add_argument('--input_fasta', "-f",  help='raw input fasta')
 parser.add_argument('--out', "-o",  help='raw input fasta')
-parser.add_argument('--alignment', "-a",  help='gotcha output alignment')
 parser.add_argument('--simulated', "-s",  help='simulated data')
 parser.add_argument('--baits', "-b",  help='bait fasta')
 parser.add_argument('--bait_length', "-bl",  help='bait lenght', default=80)
@@ -20,17 +23,10 @@ parser.add_argument('--max_distance', "-md",  help='Maximum distance bait read',
 parser.add_argument('--min_overlap', "-mo",  help='min overlap seq -> bait ', default=50, type=int)
 
 parser.add_argument('--ngsngs_in', "-ngs",  help='If ngsngs simulated fasta is used', action='store_true')
-parser.add_argument('--n_simulated', "-n",  help='number of reads to simulate', default=10000, type=int)
+parser.add_argument('--n_simulated', "-n",  help='number of reads to simulate', default=1000    , type=int)
 
 #parser.add_argument('--gz', "-gz",  help='if input file is gz', action='store_true')
 args=parser.parse_args()
-
-def hamming_dist(bait, read): 
-    distance = 0
-    for i in range(len(bait)):
-        if bait[i] != read[i]:
-            distance += 1
-    return(1-(distance/len(read)))
 
 def make_fasta_dict():
     fasta = open(args.input_fasta)
@@ -45,28 +41,11 @@ def make_fasta_dict():
             seq=str()
             header=re.sub("\n|>", "", row)
         else:
-            seq=seq+re.sub("\n", "", row)
+            seq=seq+re.sub("\n", "", re.sub('-', '', row))
         
         i+=1
     return(fasta_dict)
 
-def make_aln_dict():
-    alignment = open(args.alignment)
-    i=0
-    alignment_dict={}
-    for row in alignment:
-        if ">" in row and i == 0:
-            header=re.sub("\n|>", "", row)
-            seq=str()
-        elif ">" in row :
-            alignment_dict.update({header:seq})
-            seq=str()
-            header=re.sub("\n|>", "", row)
-        else:
-            seq=seq+re.sub("\n", "", row)
-        
-        i+=1
-    return(alignment_dict)
 
 def make_simulated_dict_ngs_ngs():
     simulated_dict={}
@@ -100,6 +79,7 @@ def make_simulated_dict_costume():
         simulated_dict.update({ran_seq+"_sim_read_"+str(count)+"_start="+str(pos):fasta_dict[ran_seq][pos:(pos)+read_length]})
         progress.update()
     progress.close()
+
     return(simulated_dict)       
 
 def make_bait_dict():
@@ -116,176 +96,120 @@ def make_bait_dict():
             bait_dict.update({header:seq})
     return(bait_dict)
 
-def find_position(key):
-    if args.ngsngs_in == True:
-        seq_name = key.split("_")[3].split(":")[0]
-    else:
-        seq_name = key.split("_")[0]
 
-    if seq_name in alignment_dict.keys():
-        fasta_list = [alignment_dict[seq_name].upper()]
-    else : 
-        fasta_list=[]
-        for keys in alignment_dict.keys():
-              fasta_list.append(alignment_dict[keys].upper())
-   
-    simulated_read = simulated_dict[key]
-    for fasta in fasta_list :
-        for pos in range(len(fasta)):
-            if hamming_dist(fasta[pos:(pos+len(simulated_read))], simulated_read) >= 0.70 :
-                return(pos+1, len(simulated_read))
-            if pos == len(fasta)-1:
-                return(-1, -1)        
-                
-def calculate_mismatches():
-    i=0
-    with open(args.out, "w") as file:
-        progress = tqdm(total=len(simulated_dict), desc="reads parsed ")
-        file.write("read_name"+ "\t"+ \
-                   "bait_match" + "\t" + \
-                    "read_length" + "\t" + \
-                               "closest_dist" +\
-                                  "\t" + "max_overlap"+ "\t"+
-                                  "align_len" + "\n")
-        
-        for key in simulated_dict.keys():
-            dist_value="-1"
-            ham_dist_list=[]
-            bait_list=[]
-            bait_name="NA"
-            pos, read_length=find_position(key)
-            if pos == -1:
-                file.write(key.split(" ")[0]+"\t"+ \
-                            "NA" + "\t" + \
-                                 str(read_length) + "\t" + \
-                                         "NA" + "\t" + \
-                                         "NA" + "\t" + \
-                                             "NA" +"\n")
-
-                continue
-                
-            miss_min = 0
-            for bait in bait_dict.keys():
-                the_read = simulated_dict[key]
-                tile_start = int([x for x in bait.split(" ") if ":" in x][0].split(":")[0])
-
-                bait_read_pos = len(the_read)-(tile_start-pos)
-                if (bait_read_pos<0) or (bait_read_pos>len(the_read)):
-                    continue
-                if (bait_read_pos<args.min_overlap):
-                    continue
-
-                tile_correction = (tile_start-pos)+1
-                if tile_correction>0:
-                    bait_seq=bait_dict[bait][0:(len(the_read)-tile_correction)] 
-                    the_read=the_read[tile_correction:len(the_read)]
-
-                else :
-                    if pos+read_length > tile_start+args.bait_length:
-                        if tile_correction < 0:
-                            bait_seq=bait_dict[bait][(tile_correction*-1):(tile_start+args.bait_length)]
-                        else: 
-                            bait_seq=bait_dict[bait][(pos):(tile_start+args.bait_length)]
-                    else:
-                        if tile_correction < 0:
-                            bait_seq=bait_dict[bait][(tile_correction*-1):(tile_correction*-1+read_length)]
-                        else:
-                            bait_seq=bait_dict[bait][(pos):(pos+read_length)]
-                    if len(bait_seq) < len(the_read):
-                        the_read=the_read[0:len(bait_seq)]
-                    elif len(bait_seq) > len(the_read):
-                        bait_seq=the_read[0:len(the_read)]          
-                ham_dist_list.append(str(len(bait_seq))+":"+str('%.3f'%(hamming_dist(bait_seq, the_read))))
-                bait_list.append(bait)
-                miss_min = max(hamming_dist(bait_seq, the_read), miss_min)
-
-            #print(sorted(ham_dist_list,reverse=True))
-            #if i == 2:
-
-            #    quit()
-            #i+=1    
-            #continue 
-            if len(ham_dist_list) != 0:  
-                dist_value = sorted(ham_dist_list,reverse=True)[0]
-                for I in range(len(bait_list)) :
-                    if ham_dist_list[I]==dist_value:
-                        if "node" in bait_list[I]:
-                            bait_name=bait_list[I]
-                        elif bait_name == "NA":
-                            bait_name=bait_list[I]
-                            
-            if dist_value=="-1":
-                continue
-            file.write(key.split(" ")[0]+"\t"+ \
-                        re.sub(" ", "_", bait_name) + "\t" + \
-                             str(read_length) + "\t" + \
-                                    str('%.3f'%(miss_min)) + "\t" + \
-                                         dist_value+ "\t" + \
-                                            str(dist_value.split(":")[0]) + "\n")            
-            i+=1
-            
-        progress.close()
-
-def print_stats_in_terminal():
-    i=1
-    stats_file = open(args.out, "r")
-    count_outside_cap_range=0
-    capture_count=0
-    capture_count_20=0
-    not_captured=0
-    capture_count_relax=0
-    for row in stats_file:
-        if "read_name" in row : 
+######
+def under_represented_sequences():
+    file = open(args.out,  'r')
+    count_dict={}
+    for row in file:
+        read_name, bait_match, read_length, closest_dist, max_overlap, align_len = row.strip().split()
+        if closest_dist == 'closest_dist':
             continue
+        if float(closest_dist)<0.91:
+            if read_name not in count_dict:
+                count_dict[read_name]=0
+            count_dict[read_name]+=1
+    print(count_dict)
+ 
+def best_alignment(read, probe):
+    probe_length=len(probe)
+    read_length=len(read)
 
-        #print(row.split("\t"))
-        match = re.sub("\n", "", row.split("\t")[4])
-        if match == "-1":
-            #print(match)
-            count_outside_cap_range+=1
-            continue
-        match_id_score=float(match.split(":")[1])
-        match_length=int(match.split(":")[0])
-        #print(str(match_id_score) + " " + str(match_length))
-        if match_id_score >= args.max_distance and match_length >= 50 :
-            capture_count+=1
-        if match_id_score >= 0.80 and match_length >= args.min_overlap :
-            capture_count_relax+=1
-        if match_id_score >= args.max_distance and match_length >= args.min_overlap :
-            capture_count_20+=1
+    best_length=0
+    fewest_mismatches=0
+    for i in range(50, (read_length+probe_length)-50):
+        if i <= probe_length:
+            sub_probe = probe[-i:] 
         else:
-            not_captured+=1
+            sub_probe = ('-' * (i-probe_length))+probe
+        
+        if i <= read_length:
+            sub_read=read[0:i]
+        else:
+            sub_read=read
+        mismatch=0
+        alignment_length=0
+        for p, r, in zip(sub_probe.upper(), sub_read.upper()):
+            if r == "":
+                continue
+            if p != '-':
+                alignment_length+=1
+                if p!=r:
+                    mismatch+=1
+                if  mismatch > (probe_length*0.2):
+                    break
+
+        if 1-(mismatch/alignment_length)>=args.max_distance:
+            if alignment_length>=best_length:
+                best_length=alignment_length
+                if fewest_mismatches < (1-(mismatch/alignment_length)):
+                    fewest_mismatches=(1-(mismatch/alignment_length))
+            
+    return best_length, fewest_mismatches    
     
-    print("\nNumber of simulated reads\t=\t" + str(len(simulated_dict)))
-    print("Reads outside capture range\t= \t" + str(len(simulated_dict)-count_outside_cap_range))
-    print("Captured reads >=50 overlap \t=\t"+ str(capture_count))
-    print("Captured reads 80% overlap \t=\t"+ str(capture_count_relax))
-    print("Captured reads >="+str(args.min_overlap) +" overlap \t=\t"+ str(capture_count_20))
-    print("Not Captured \t\t\t=\t"+ str((len(simulated_dict)-count_outside_cap_range)-capture_count_20))
+def find_best_probe_2():
+    progress=tqdm(total=len(simulated_dict), desc='finding probes to reads')
+    for read_name in simulated_dict:
+        read=simulated_dict[read_name]
+        #print(read)
+        best_length=0
+        best_mismatches=9999
+        print('bait_name', '\t', 'len(read)', '\t', 'length', '\t', 'mismatches')
+        for bait_name in bait_dict:
+            bait=bait_dict[bait_name]
+            length, mismatches = best_alignment(read, bait)
+            if mismatches != 9999 and length>=50:
+                print(bait_name, '\t', len(read), '\t', length, '\t', '%.3f'%(mismatches))
+            if length < best_length and best_mismatches > mismatches:
+                best_length=length
+                best_mismatches=mismatches
+        progress.update()
+        #print(best_length, best_mismatches, len(read) )
 
-def print_pandas():
-    stats_pf = pd.read_csv(args.out,  delimiter= "\t")
+# Define process_bait at the module level
+def process_bait(args):
+    bait_name, read = args
+    bait = bait_dict[bait_name]
+    length, mismatches = best_alignment(read, bait)
+    return bait_name, len(read), length, mismatches
 
-    plot=1
-    plt.rcParams['figure.figsize'] = [15,10]
-    for i in range(50, 170, 10):
-        sub_bin = stats_pf.loc[(stats_pf['read_length']>=i) &(stats_pf['read_length']<i+10)]
-
-        plt.subplot(3,4,plot)
-        plt.plot(sub_bin['closest_dist'], 
-                 sub_bin['align_len'], 'ko', markersize=4, alpha=0.025)
-        plt.ylim(ymin = 0, ymax = 81)
-        plt.xlim(xmin = 0.80, xmax = 1.005)
-        plt.gca().spines.top.set_visible(False)
-        plt.gca().spines.right.set_visible(False)
-        plt.xticks(np.arange(0.80, 1.05, 0.05))
-        plt.text(0.81, 81.5, "Read bin = "+str(i)+":"+str(i+10))
-        plt.text(0.81, 20.0, "N = "+str(len(sub_bin)))
-        plt.text(0.81, 15.0, "91% = "+str(round(sum(sub_bin['closest_dist']>=0.90)/len(sub_bin),2)))
-        plt.text(0.81, 10.0, "50nt, 91% = "+str(round(len(sub_bin.loc[(sub_bin['closest_dist']>=0.90) & (sub_bin['align_len']>=50)])/len(sub_bin), 2)))
-
-        plot+=1
-    plt.savefig("output.svg")
+def find_best_probe():
+    file = open('read2bait.tsv', 'w')
+    file.write('\t'.join(['read_length', 'bait_alignment', 'bait_count', 'weighted_mean'])+'\n')
+    progress = tqdm(total=len(simulated_dict), desc='Finding probes to reads')
+    no_bait = 0
+    total_reads=0
+    for read_name in simulated_dict:
+        read = simulated_dict[read_name]
+        # Use multiprocessing Pool
+        with Pool(processes=12) as pool:  # Adjust `processes` as needed
+            results = pool.map(process_bait, [(bait_name, read) for bait_name in bait_dict])
+            count=0
+            mismatches_list=[]
+            align_length=[]
+            for bait_name, read_len, length, mismatches in results:
+                if mismatches != 9999 and length >= 50:
+                    count+=1
+                    mismatches_list.append(mismatches)
+                    align_length.append(length)
+            if len(align_length)!=0:
+                weighted_mean = np.average(mismatches_list, weights=align_length)
+            else:
+                weighted_mean="NA"
+            
+            if len(align_length)!=0:
+                file.write('\t'.join([str(len(read)), str(max(align_length)), str(count), str('%.3f' % weighted_mean)])+'\n')
+                total_reads+=1
+            else:
+                no_bait+=1
+                file.write('\t'.join([str(len(read)), '0', str(count), '0'])+'\n')
+            
+        progress.update()
+    progress.close()
+    file.close()
+    subprocess.run(['validation_plotting.R', 'read2bait.tsv'] , stdout=subprocess.DEVNULL , stderr=subprocess.DEVNULL)
+    
+    print('\n%.3f'%(1-(no_bait/(total_reads+no_bait))), 'of the simulated had a matching probe with at least 91% seq identity and more than 50 nt overlap')
 
 if __name__ == '__main__':
 
@@ -296,10 +220,12 @@ if __name__ == '__main__':
         simulated_dict = make_simulated_dict_costume()
 
     bait_dict = make_bait_dict()
-    alignment_dict = make_aln_dict()
-
-    calculate_mismatches()
+    #alignment_dict = make_aln_dict()
+    find_best_probe()
+    
+    #calculate_mismatches()
     #print_stats_in_terminal()
-    print_pandas()
+    #print_pandas()
+    #under_represented_sequences()
     
 
